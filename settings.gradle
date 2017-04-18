@@ -1,1 +1,1 @@
-include ':app'
+include ':card-slider-simple-example', ':card-slider'
