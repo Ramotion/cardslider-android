@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.ramotion.cardslider.CardSliderLayoutManager;
 import com.ramotion.cardslider.SliderAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
     private void initSlider() {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(sliderAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerView.setLayoutManager(new CardSliderLayoutManager());
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
 
 }
