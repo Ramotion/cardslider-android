@@ -1,5 +1,6 @@
 package com.ramotion.cardslider;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
@@ -7,13 +8,19 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.LinkedList;
+
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
     private static final boolean DEBUG = true;
 
+    private static final int INVALID_VALUE = -1;
+
     private final SparseArray<View> viewCache = new SparseArray<>();
 
     private SliderParams params;
+
+    private int requestedPosition = INVALID_VALUE;
 
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
@@ -38,68 +45,211 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
     }
 
     @Override
+    public void scrollToPosition(int position) {
+        if (position > getItemCount()) {
+            return;
+        }
+
+        requestedPosition = position;
+        requestLayout();
+    }
+
+    @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
-        final int delta = scrollHorizontallyInternal(dx);
-        offsetChildrenHorizontal(-delta);
+        requestedPosition = INVALID_VALUE;
+
+        int delta;
+        if (dx < 0) {
+            delta = scrollRight(dx);
+        } else {
+            delta = scrollLeft(dx);
+        }
+
         fill(recycler);
         return delta;
     }
 
-    private int scrollHorizontallyInternal(int dx) {
-        // TODO: fix scroll left
-
+    private int scrollRight(int dx) {
         final int childCount = getChildCount();
-        final int itemCount = getItemCount();
 
-        if (childCount == 0){
+        if (childCount == 0) {
             return 0;
         }
 
-        int delta = 0;
+        final int delta = getAllowedRightDelta(getChildAt(childCount - 1), dx);
 
-        if (dx < 0) {
-            final View firstView = getChildAt(0);
-            final boolean isFirstItem = getPosition(firstView) == 0;
-            if (isFirstItem) {
-                delta = Math.max(getDecoratedLeft(firstView), dx);
+        final LinkedList<View> rightViews = new LinkedList<>();
+        final LinkedList<View> leftViews = new LinkedList<>();
+
+        for (int i = childCount - 1; i >= 0; i--) {
+            final View view = getChildAt(i);
+            final int viewLeft = getDecoratedLeft(view);
+
+            if (viewLeft >= params.activeCardRight) {
+                rightViews.add(view);
             } else {
-                delta = dx;
+                leftViews.add(view);
             }
-        } else if (dx > 0) {
-            final View lastView = getChildAt(childCount - 1);
-            final boolean isLastItem = getPosition(lastView) == itemCount - 1;
-            if (isLastItem) {
-                delta = Math.min(getDecoratedRight(lastView), getWidth());
+        }
+
+        for (View view: rightViews) {
+            view.offsetLeftAndRight(-getAllowedRightDelta(view, dx));
+        }
+
+        View prevView = null;
+        for (int i = 0, cnt = leftViews.size(); i < cnt; i++) {
+            if (prevView == null || getDecoratedLeft(prevView) > params.activeCardRight) {
+                final View view = leftViews.get(i);
+                view.offsetLeftAndRight(-getAllowedRightDelta(view, dx));
+                prevView = view;
+            } else if (getDecoratedLeft(prevView) > params.activeCardCenter) {
+                final int borderStep = params.activeCardLeft / SliderParams.LEFT_CARD_COUNT;
+                int border = params.activeCardLeft;
+
+                for (int j = i; j < cnt; j++) {
+                    final View view = leftViews.get(j);
+                    final int viewLeft = getDecoratedLeft(view);
+
+                    if (viewLeft - delta >= border) {
+                        view.offsetLeftAndRight(border - viewLeft);
+                    } else {
+                        view.offsetLeftAndRight(-delta);
+                    }
+
+                    border = Math.max(0, border - borderStep);
+                }
+
+                break;
             } else {
-                delta = dx;
+                break;
             }
         }
 
         return delta;
     }
 
+    private int scrollLeft(int dx) {
+        final int childCount = getChildCount();
+
+        if (childCount == 0) {
+            return 0;
+        }
+
+        int delta;
+
+        final View lastView = getChildAt(childCount - 1);
+        final boolean isLastItem = getPosition(lastView) == getItemCount() - 1;
+        if (isLastItem) {
+            delta = Math.min(dx, getDecoratedRight(lastView) - params.activeCardRight);
+        } else {
+            delta = dx;
+        }
+
+        final LinkedList<View> leftViews = new LinkedList<>();
+        final LinkedList<View> centerViews = new LinkedList<>();
+
+        for (int i = 0; i < childCount; i++) {
+            final View view = getChildAt(i);
+            final int viewLeft = getDecoratedLeft(view);
+
+            if (viewLeft < params.activeCardLeft) {
+                leftViews.add(view);
+            } else if (viewLeft < params.activeCardRight) {
+                centerViews.add(view);
+            } else {
+                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, 0));
+            }
+        }
+
+        if (centerViews.size() >= 2) {
+            final View secondTopCard = centerViews.get(1);
+            final int secondTopCardLeft = getDecoratedLeft(secondTopCard);
+
+            if (secondTopCardLeft <= params.activeCardCenter) {
+                final View firstTopCard = centerViews.get(0);
+                firstTopCard.offsetLeftAndRight(getAllowedLeftDelta(firstTopCard, delta, 0));
+            }
+            secondTopCard.offsetLeftAndRight(getAllowedLeftDelta(secondTopCard, delta, 0));
+        } else if (!leftViews.isEmpty() && !centerViews.isEmpty()) {
+            for (int i = 0, cnt = leftViews.size(); i < cnt; i++) {
+                int leftBorder = 0;
+                if (i == cnt - 1) {
+                    leftBorder = params.activeCardLeft / 2;
+                }
+                final View view = getChildAt(i);
+                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, leftBorder));
+            }
+
+            for (View view : centerViews) {
+                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, params.activeCardLeft));
+            }
+        }
+
+        return delta;
+    }
+
+    private int getAllowedLeftDelta(@NonNull View view, int dx, int border) {
+        final int viewLeft = getDecoratedLeft(view);
+        if (viewLeft - dx > border) {
+            return -dx;
+        } else {
+            return border - viewLeft;
+        }
+    }
+
+    private int getAllowedRightDelta(@NonNull View view, int dx) {
+        final int pos = getPosition(view);
+        final int border = params.activeCardLeft + pos * params.cardWidth;
+        final int vewLeft = getDecoratedLeft(view);
+
+        if (vewLeft + Math.abs(dx) < border) {
+            return dx;
+        } else {
+            return vewLeft - border;
+        }
+    }
+
     @Nullable
-    private View getAnchorView() {
+    private View getTopView() {
         if (getChildCount() == 0) {
             return null;
         }
 
-        View view = null;
-        final int childCount = getChildCount();
+        View result = null;
+        float lastScaleX = 0f;
 
-        for (int i = 0; i < childCount - 1; i++) {
-            view = getChildAt(i);
-            final int right = getDecoratedRight(view);
-            if (right > params.activeCardLeft && right < params.activeCardRight) {
-                break;
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View view = getChildAt(i);
+            if (getDecoratedLeft(view) >= params.activeCardRight) {
+                continue;
+            }
+
+            final float scaleX = ViewCompat.getScaleX(view);
+            if (lastScaleX < scaleX) {
+                lastScaleX = scaleX;
+                result = view;
             }
         }
 
-        return view;
+        return result;
+    }
+
+    private int getAnchorPos() {
+        int result = 0;
+        if (requestedPosition != INVALID_VALUE) {
+            result = requestedPosition;
+        } else {
+            final View topView = getTopView();
+            if (topView != null) {
+                result = getPosition(topView);
+            }
+        }
+
+        return result;
     }
 
     private void fill(RecyclerView.Recycler recycler) {
-        final View anchorView = getAnchorView();
+        final int anchorPos = getAnchorPos();
 
         viewCache.clear();
 
@@ -109,32 +259,28 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             viewCache.put(pos, view);
         }
 
-        for (int i = 0; i < viewCache.size(); i++) {
+        for (int i = 0, cnt = viewCache.size(); i < cnt; i++) {
             detachView(viewCache.valueAt(i));
         }
 
-        fillLeft(anchorView, recycler);
-        fillRight(anchorView, recycler);
+        fillLeft(anchorPos, recycler);
+        fillRight(anchorPos, recycler);
 
-        for (int i=0; i < viewCache.size(); i++) {
+        for (int i = 0, cnt = viewCache.size(); i < cnt; i++) {
             recycler.recycleView(viewCache.valueAt(i));
         }
 
         updateViewScale();
     }
 
-    private void fillLeft(@Nullable View anchorView, RecyclerView.Recycler recycler) {
-        if (anchorView == null) {
+    private void fillLeft(int anchorPos, RecyclerView.Recycler recycler) {
+        if (anchorPos == INVALID_VALUE) {
             return;
         }
 
-        final int stackedCount = 2;
-
-        int anchorPos = getPosition(anchorView);
-        int pos = Math.max(0, anchorPos - stackedCount);
-        int viewLeft = 0;
-        int anchorViewLeft = getDecoratedLeft(anchorView);
-        int layoutStep = (anchorViewLeft - viewLeft) / stackedCount;
+        final int layoutStep = params.activeCardLeft / SliderParams.LEFT_CARD_COUNT;
+        int pos = Math.max(0, anchorPos - SliderParams.LEFT_CARD_COUNT);
+        int viewLeft = Math.max(0, SliderParams.LEFT_CARD_COUNT - (anchorPos - pos)) * layoutStep;
 
         while (pos < anchorPos) {
             View view = viewCache.get(pos);
@@ -155,18 +301,18 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
     }
 
-    private void fillRight(@Nullable View anchorView, RecyclerView.Recycler recycler) {
+    private void fillRight(int anchorPos, RecyclerView.Recycler recycler) {
+        if (anchorPos == INVALID_VALUE) {
+            return;
+        }
+
         final int width = getWidth();
         final int itemCount = getItemCount();
 
-        int pos = 0;
+        int pos = anchorPos;
         int viewLeft = params.activeCardLeft;
-        if (anchorView != null) {
-            pos = getPosition(anchorView);
-            viewLeft = getDecoratedLeft(anchorView);
-        }
-
         boolean fillRight = true;
+
         while (fillRight && pos < itemCount) {
             View view = viewCache.get(pos);
             if (view != null) {
@@ -187,52 +333,38 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
     }
 
     private void updateViewScale() {
-        final int childCount = getChildCount();
-
-        for (int i = 0; i < childCount; i++) {
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
 
             if (viewLeft < params.activeCardLeft) {
-                // TODO: scale down
-
-                final float minScale = 0.7f;
-                final float maxScale = 0.95f;
-                final float totalScale = maxScale - minScale;
-
                 final float ratio = (float) viewLeft / params.activeCardLeft;
-                final float scale = minScale + totalScale * ratio;
+                final float scale = SliderParams.SCALE_LEFT + SliderParams.SCALE_CENTER_TO_LEFT * ratio;
                 ViewCompat.setScaleX(view, scale);
                 ViewCompat.setScaleY(view, scale);
-//                ViewCompat.setAlpha(view, ratio);
-
-                if (DEBUG) {
-                    Log.d("D", "viewLeft < leftBorder: " + i);
-                    Log.d("D", "ratio: " + ratio);
-                    Log.d("D", "scale: " + scale);
+                ViewCompat.setAlpha(view, 0.1f + ratio);
+                if (viewLeft < params.activeCardLeft / 2) {
+                    ViewCompat.setZ(view, 4);
+                } else {
+                    ViewCompat.setZ(view, 6);
                 }
             } else if (viewLeft < params.activeCardCenter) {
-                // TODO: no scale - anchorView
-                // TODO: restore alpha
-                if (DEBUG) {
-                    Log.d("D", "viewLeft < center: " + i);
-                }
-                ViewCompat.setScaleX(view, 0.95f);
-                ViewCompat.setScaleY(view, 0.95f);
-                ViewCompat.setZ(view, 10);
+                ViewCompat.setScaleX(view, SliderParams.SCALE_CENTER);
+                ViewCompat.setScaleY(view, SliderParams.SCALE_CENTER);
+                ViewCompat.setZ(view, 12); // TODO: move to contants
+                ViewCompat.setAlpha(view, 1);
             } else if (viewLeft < params.activeCardRight) {
-                // TODO: scale up
-                if (DEBUG) {
-                    Log.d("D", "viewLeft < rightBorder: " + i);
-                }
+                final float ratio = (float) (viewLeft - params.activeCardCenter) / (params.activeCardRight - params.activeCardCenter);
+                final float scale = SliderParams.SCALE_CENTER - SliderParams.SCALE_CENTER_TO_RIGHT * ratio;
+                ViewCompat.setScaleX(view, scale);
+                ViewCompat.setScaleY(view, scale);
+                ViewCompat.setZ(view, 16); // TODO: move to contants
+                ViewCompat.setAlpha(view, 1);
             } else if (viewLeft >= params.activeCardRight) {
-                if (DEBUG) {
-                    Log.d("D", "viewLeft >= rightBorder: " + i);
-                }
-
-                ViewCompat.setScaleX(view, 0.8f);
-                ViewCompat.setScaleY(view, 0.8f);
-                ViewCompat.setZ(view, 5);
+                ViewCompat.setScaleX(view, SliderParams.SCALE_RIGHT);
+                ViewCompat.setScaleY(view, SliderParams.SCALE_RIGHT);
+                ViewCompat.setZ(view, 8); // TODO: move to contants
+                ViewCompat.setAlpha(view, 1);
             }
         }
     }
@@ -243,6 +375,15 @@ class SliderParams{
 
     private static final float VIEW_WIDTH_PERCENT = 0.35f;
     private static final float LEFT_BORDER_PERCENT = 0.1f;
+
+    static final float SCALE_LEFT = 0.7f;
+    static final float SCALE_CENTER = 0.95f;
+    static final float SCALE_RIGHT = 0.8f;
+
+    static final float SCALE_CENTER_TO_LEFT = SCALE_CENTER - SCALE_LEFT;
+    static final float SCALE_CENTER_TO_RIGHT = SCALE_CENTER - SCALE_RIGHT;
+
+    static final int LEFT_CARD_COUNT = 2;
 
     final int cardWidth;
 

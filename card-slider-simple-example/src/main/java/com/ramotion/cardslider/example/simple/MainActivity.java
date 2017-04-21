@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(sliderAdapter);
         recyclerView.setLayoutManager(new CardSliderLayoutManager());
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        recyclerView.scrollToPosition(8);
     }
 
 }
