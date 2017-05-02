@@ -16,9 +16,23 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
     private static final int INVALID_VALUE = -1;
 
+    private static final float VIEW_WIDTH_PERCENT = 0.35f;
+    private static final float LEFT_BORDER_PERCENT = 0.1f;
+    private static final float SCALE_LEFT = 0.7f;
+    private static final float SCALE_CENTER = 0.95f;
+    private static final float SCALE_RIGHT = 0.8f;
+    private static final float SCALE_CENTER_TO_LEFT = SCALE_CENTER - SCALE_LEFT;
+    private static final float SCALE_CENTER_TO_RIGHT = SCALE_CENTER - SCALE_RIGHT;
+    private static final int LEFT_CARD_COUNT = 2;
+
     private final SparseArray<View> viewCache = new SparseArray<>();
 
-    private SliderParams params;
+    private boolean initialized = false;
+
+    private int cardWidth;
+    private int activeCardLeft;
+    private int activeCardRight;
+    private int activeCardCenter;
 
     private int requestedPosition = INVALID_VALUE;
 
@@ -31,8 +45,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        if (params == null) {
-            params = new SliderParams(this);
+        if (!initialized) {
+            initialize();
         }
 
         detachAndScrapAttachedViews(recycler);
@@ -69,6 +83,15 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
         return delta;
     }
 
+    private void initialize() {
+        final int width = getWidth();
+        cardWidth = (int) (width * VIEW_WIDTH_PERCENT);
+
+        activeCardLeft = (int) (width * LEFT_BORDER_PERCENT);
+        activeCardRight = activeCardLeft + (int) (width * VIEW_WIDTH_PERCENT);
+        activeCardCenter = activeCardLeft + ((activeCardRight - activeCardLeft) / 2);
+    }
+
     private int scrollRight(int dx) {
         final int childCount = getChildCount();
 
@@ -85,7 +108,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
 
-            if (viewLeft >= params.activeCardRight) {
+            if (viewLeft >= activeCardRight) {
                 rightViews.add(view);
             } else {
                 leftViews.add(view);
@@ -98,13 +121,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
         View prevView = null;
         for (int i = 0, cnt = leftViews.size(); i < cnt; i++) {
-            if (prevView == null || getDecoratedLeft(prevView) > params.activeCardRight) {
+            if (prevView == null || getDecoratedLeft(prevView) > activeCardRight) {
                 final View view = leftViews.get(i);
                 view.offsetLeftAndRight(-getAllowedRightDelta(view, dx));
                 prevView = view;
-            } else if (getDecoratedLeft(prevView) > params.activeCardCenter) {
-                final int borderStep = params.activeCardLeft / SliderParams.LEFT_CARD_COUNT;
-                int border = params.activeCardLeft;
+            } else if (getDecoratedLeft(prevView) > activeCardCenter) {
+                final int borderStep = activeCardLeft / LEFT_CARD_COUNT;
+                int border = activeCardLeft;
 
                 for (int j = i; j < cnt; j++) {
                     final View view = leftViews.get(j);
@@ -140,7 +163,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
         final View lastView = getChildAt(childCount - 1);
         final boolean isLastItem = getPosition(lastView) == getItemCount() - 1;
         if (isLastItem) {
-            delta = Math.min(dx, getDecoratedRight(lastView) - params.activeCardRight);
+            delta = Math.min(dx, getDecoratedRight(lastView) - activeCardRight);
         } else {
             delta = dx;
         }
@@ -152,9 +175,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
 
-            if (viewLeft < params.activeCardLeft) {
+            if (viewLeft < activeCardLeft) {
                 leftViews.add(view);
-            } else if (viewLeft < params.activeCardRight) {
+            } else if (viewLeft < activeCardRight) {
                 centerViews.add(view);
             } else {
                 view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, 0));
@@ -165,7 +188,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             final View secondTopCard = centerViews.get(1);
             final int secondTopCardLeft = getDecoratedLeft(secondTopCard);
 
-            if (secondTopCardLeft <= params.activeCardCenter) {
+            if (secondTopCardLeft <= activeCardCenter) {
                 final View firstTopCard = centerViews.get(0);
                 firstTopCard.offsetLeftAndRight(getAllowedLeftDelta(firstTopCard, delta, 0));
             }
@@ -174,14 +197,14 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             for (int i = 0, cnt = leftViews.size(); i < cnt; i++) {
                 int leftBorder = 0;
                 if (i == cnt - 1) {
-                    leftBorder = params.activeCardLeft / 2;
+                    leftBorder = activeCardLeft / 2;
                 }
                 final View view = getChildAt(i);
                 view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, leftBorder));
             }
 
             for (View view : centerViews) {
-                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, params.activeCardLeft));
+                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, activeCardLeft));
             }
         }
 
@@ -199,7 +222,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
     private int getAllowedRightDelta(@NonNull View view, int dx) {
         final int pos = getPosition(view);
-        final int border = params.activeCardLeft + pos * params.cardWidth;
+        final int border = activeCardLeft + pos * cardWidth;
         final int vewLeft = getDecoratedLeft(view);
 
         if (vewLeft + Math.abs(dx) < border) {
@@ -220,7 +243,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             final View view = getChildAt(i);
-            if (getDecoratedLeft(view) >= params.activeCardRight) {
+            if (getDecoratedLeft(view) >= activeCardRight) {
                 continue;
             }
 
@@ -278,9 +301,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             return;
         }
 
-        final int layoutStep = params.activeCardLeft / SliderParams.LEFT_CARD_COUNT;
-        int pos = Math.max(0, anchorPos - SliderParams.LEFT_CARD_COUNT);
-        int viewLeft = Math.max(0, SliderParams.LEFT_CARD_COUNT - (anchorPos - pos)) * layoutStep;
+        final int layoutStep = activeCardLeft / LEFT_CARD_COUNT;
+        int pos = Math.max(0, anchorPos - LEFT_CARD_COUNT);
+        int viewLeft = Math.max(0, LEFT_CARD_COUNT - (anchorPos - pos)) * layoutStep;
 
         while (pos < anchorPos) {
             View view = viewCache.get(pos);
@@ -292,7 +315,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
                 addView(view);
                 measureChildWithMargins(view, 0, 0);
                 final int viewHeight = getDecoratedMeasuredHeight(view);
-                layoutDecorated(view, viewLeft, 0, viewLeft + params.cardWidth, viewHeight);
+                layoutDecorated(view, viewLeft, 0, viewLeft + cardWidth, viewHeight);
             }
 
             viewLeft += layoutStep;
@@ -310,7 +333,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
         final int itemCount = getItemCount();
 
         int pos = anchorPos;
-        int viewLeft = params.activeCardLeft;
+        int viewLeft = activeCardLeft;
         boolean fillRight = true;
 
         while (fillRight && pos < itemCount) {
@@ -323,7 +346,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
                 addView(view);
                 measureChildWithMargins(view, 0, 0);
                 final int viewHeight = getDecoratedMeasuredHeight(view);
-                layoutDecorated(view, viewLeft, 0, viewLeft + params.cardWidth, viewHeight);
+                layoutDecorated(view, viewLeft, 0, viewLeft + cardWidth, viewHeight);
             }
 
             viewLeft = getDecoratedRight(view);
@@ -337,67 +360,36 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
 
-            if (viewLeft < params.activeCardLeft) {
-                final float ratio = (float) viewLeft / params.activeCardLeft;
-                final float scale = SliderParams.SCALE_LEFT + SliderParams.SCALE_CENTER_TO_LEFT * ratio;
+            if (viewLeft < activeCardLeft) {
+                final float ratio = (float) viewLeft / activeCardLeft;
+                final float scale = SCALE_LEFT + SCALE_CENTER_TO_LEFT * ratio;
                 ViewCompat.setScaleX(view, scale);
                 ViewCompat.setScaleY(view, scale);
                 ViewCompat.setAlpha(view, 0.1f + ratio);
-                if (viewLeft < params.activeCardLeft / 2) {
+                if (viewLeft < activeCardLeft / 2) {
                     ViewCompat.setZ(view, 4);
                 } else {
                     ViewCompat.setZ(view, 6);
                 }
-            } else if (viewLeft < params.activeCardCenter) {
-                ViewCompat.setScaleX(view, SliderParams.SCALE_CENTER);
-                ViewCompat.setScaleY(view, SliderParams.SCALE_CENTER);
+            } else if (viewLeft < activeCardCenter) {
+                ViewCompat.setScaleX(view, SCALE_CENTER);
+                ViewCompat.setScaleY(view, SCALE_CENTER);
                 ViewCompat.setZ(view, 12); // TODO: move to contants
                 ViewCompat.setAlpha(view, 1);
-            } else if (viewLeft < params.activeCardRight) {
-                final float ratio = (float) (viewLeft - params.activeCardCenter) / (params.activeCardRight - params.activeCardCenter);
-                final float scale = SliderParams.SCALE_CENTER - SliderParams.SCALE_CENTER_TO_RIGHT * ratio;
+            } else if (viewLeft < activeCardRight) {
+                final float ratio = (float) (viewLeft - activeCardCenter) / (activeCardRight - activeCardCenter);
+                final float scale = SCALE_CENTER - SCALE_CENTER_TO_RIGHT * ratio;
                 ViewCompat.setScaleX(view, scale);
                 ViewCompat.setScaleY(view, scale);
                 ViewCompat.setZ(view, 16); // TODO: move to contants
                 ViewCompat.setAlpha(view, 1);
-            } else if (viewLeft >= params.activeCardRight) {
-                ViewCompat.setScaleX(view, SliderParams.SCALE_RIGHT);
-                ViewCompat.setScaleY(view, SliderParams.SCALE_RIGHT);
+            } else if (viewLeft >= activeCardRight) {
+                ViewCompat.setScaleX(view, SCALE_RIGHT);
+                ViewCompat.setScaleY(view, SCALE_RIGHT);
                 ViewCompat.setZ(view, 8); // TODO: move to contants
                 ViewCompat.setAlpha(view, 1);
             }
         }
-    }
-
-}
-
-class SliderParams{
-
-    private static final float VIEW_WIDTH_PERCENT = 0.35f;
-    private static final float LEFT_BORDER_PERCENT = 0.1f;
-
-    static final float SCALE_LEFT = 0.7f;
-    static final float SCALE_CENTER = 0.95f;
-    static final float SCALE_RIGHT = 0.8f;
-
-    static final float SCALE_CENTER_TO_LEFT = SCALE_CENTER - SCALE_LEFT;
-    static final float SCALE_CENTER_TO_RIGHT = SCALE_CENTER - SCALE_RIGHT;
-
-    static final int LEFT_CARD_COUNT = 2;
-
-    final int cardWidth;
-
-    final int activeCardLeft;
-    final int activeCardRight;
-    final int activeCardCenter;
-
-    SliderParams(RecyclerView.LayoutManager lm) {
-        final int width = lm.getWidth();
-        cardWidth = (int) (width * VIEW_WIDTH_PERCENT);
-
-        activeCardLeft = (int) (width * LEFT_BORDER_PERCENT);
-        activeCardRight = activeCardLeft + (int) (width * VIEW_WIDTH_PERCENT);
-        activeCardCenter = activeCardLeft + ((activeCardRight - activeCardLeft) / 2);
     }
 
 }
