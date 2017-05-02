@@ -24,7 +24,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     @Override
     public int getItemCount() {
-        return 10;
+        return 100;
     }
 
 }

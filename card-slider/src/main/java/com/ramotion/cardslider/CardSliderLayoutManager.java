@@ -1,8 +1,10 @@
 package com.ramotion.cardslider;
 
+import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseArray;
@@ -10,7 +12,8 @@ import android.view.View;
 
 import java.util.LinkedList;
 
-public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
+public class CardSliderLayoutManager extends RecyclerView.LayoutManager
+        implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
     private static final boolean DEBUG = true;
 
@@ -60,7 +63,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
     @Override
     public void scrollToPosition(int position) {
-        if (position > getItemCount()) {
+        if (position < 0 || position >= getItemCount()) {
             return;
         }
 
@@ -81,6 +84,51 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager {
 
         fill(recycler);
         return delta;
+    }
+
+    @Override
+    public PointF computeScrollVectorForPosition(int targetPosition) {
+        return new PointF(targetPosition - getAnchorPos(), 0);
+    }
+
+    @Override
+    public void smoothScrollToPosition(final RecyclerView recyclerView, RecyclerView.State state, final int position) {
+        if (position < 0 || position >= getItemCount()) {
+            return;
+        }
+
+        final LinearSmoothScroller scroller = new LinearSmoothScroller(recyclerView.getContext()) {
+            @Override
+            public int calculateDxToMakeVisible(View view, int snapPreference) {
+                final int viewStart = getDecoratedLeft(view);
+                if (viewStart > activeCardLeft) {
+                    return activeCardLeft - viewStart;
+                } else {
+                    int delta = 0;
+                    int firstRightViewPos = 0;
+
+                    for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+                        final View child = getChildAt(i);
+                        final int viewLeft = getDecoratedLeft(child);
+                        if (viewLeft > activeCardLeft && viewLeft < activeCardRight) {
+                            delta = activeCardRight - viewLeft;
+                            firstRightViewPos = getPosition(child);
+                            break;
+                        }
+                    }
+
+                    return delta + (cardWidth) * Math.max(0, firstRightViewPos - getTargetPosition() - 1);
+                }
+            }
+
+            @Override
+            protected int calculateTimeForDeceleration(int dx) {
+                return 500;
+            }
+        };
+
+        scroller.setTargetPosition(position);
+        startSmoothScroll(scroller);
     }
 
     private void initialize() {
