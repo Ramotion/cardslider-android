@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -32,10 +31,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private boolean initialized = false;
 
-    private int cardWidth;
-    private int activeCardLeft;
-    private int activeCardRight;
-    private int activeCardCenter;
+    private int cardWidth = INVALID_VALUE;
+    private int activeCardLeft = INVALID_VALUE;
+    private int activeCardRight = INVALID_VALUE;
+    private int activeCardCenter = INVALID_VALUE;
 
     private int requestedPosition = INVALID_VALUE;
 
@@ -105,19 +104,20 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                     return activeCardLeft - viewStart;
                 } else {
                     int delta = 0;
-                    int firstRightViewPos = 0;
+                    int topViewPos = 0;
 
-                    for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-                        final View child = getChildAt(i);
-                        final int viewLeft = getDecoratedLeft(child);
-                        if (viewLeft > activeCardLeft && viewLeft < activeCardRight) {
-                            delta = activeCardRight - viewLeft;
-                            firstRightViewPos = getPosition(child);
-                            break;
+                    final View topView = getTopView();
+                    if (topView != null) {
+                        topViewPos = getPosition(topView);
+                        if (topViewPos != position) {
+                            final int topViewLeft = getDecoratedLeft(topView);
+                            if (topViewLeft >= activeCardLeft && topViewLeft < activeCardRight) {
+                                delta = activeCardRight - topViewLeft;
+                            }
                         }
                     }
 
-                    return delta + (cardWidth) * Math.max(0, firstRightViewPos - getTargetPosition() - 1);
+                    return delta + (cardWidth) * Math.max(0, topViewPos - position - 1);
                 }
             }
 
@@ -131,6 +131,32 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         startSmoothScroll(scroller);
     }
 
+    @Nullable
+    View getTopView() {
+        if (getChildCount() == 0) {
+            return null;
+        }
+
+        View result = null;
+        float lastZ = 0f;
+
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View child = getChildAt(i);
+
+            final float z = ViewCompat.getZ(child);
+            if (lastZ < z) {
+                lastZ = z;
+                result = child;
+            }
+        }
+
+        return result;
+    }
+
+    int[] getCardBorders() {
+        return new int[] {activeCardLeft, activeCardCenter, activeCardRight};
+    }
+
     private void initialize() {
         final int width = getWidth();
         cardWidth = (int) (width * VIEW_WIDTH_PERCENT);
@@ -138,6 +164,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         activeCardLeft = (int) (width * LEFT_BORDER_PERCENT);
         activeCardRight = activeCardLeft + (int) (width * VIEW_WIDTH_PERCENT);
         activeCardCenter = activeCardLeft + ((activeCardRight - activeCardLeft) / 2);
+
+        initialized = true;
     }
 
     private int scrollRight(int dx) {
@@ -280,39 +308,29 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
-    @Nullable
-    private View getTopView() {
-        if (getChildCount() == 0) {
-            return null;
-        }
-
-        View result = null;
-        float lastScaleX = 0f;
-
-        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-            final View view = getChildAt(i);
-            if (getDecoratedLeft(view) >= activeCardRight) {
-                continue;
-            }
-
-            final float scaleX = ViewCompat.getScaleX(view);
-            if (lastScaleX < scaleX) {
-                lastScaleX = scaleX;
-                result = view;
-            }
-        }
-
-        return result;
-    }
-
     private int getAnchorPos() {
         int result = 0;
         if (requestedPosition != INVALID_VALUE) {
             result = requestedPosition;
         } else {
-            final View topView = getTopView();
-            if (topView != null) {
-                result = getPosition(topView);
+            View biggestView = null;
+            float lastScaleX = 0f;
+
+            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+                final View child = getChildAt(i);
+                if (getDecoratedLeft(child) >= activeCardRight) {
+                    continue;
+                }
+
+                final float scaleX = ViewCompat.getScaleX(child);
+                if (lastScaleX < scaleX) {
+                    lastScaleX = scaleX;
+                    biggestView = child;
+                }
+            }
+
+            if (biggestView != null) {
+                result = getPosition(biggestView);
             }
         }
 
