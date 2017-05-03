@@ -14,12 +14,52 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <LinearLayout
         android:layout_marginTop="50dp"
-        android:layout_gravity="center"
-        android:text="smooth scroll" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_scroll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="50dp"
+            android:text="99"
+            android:layout_marginStart="50dp"
+            android:inputType="numberDecimal" />
+
+        <Button
+            android:id="@+id/button_scroll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:text="smooth scroll" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="50dp"
+            android:text="99"
+            android:layout_marginStart="50dp"
+            android:inputType="numberDecimal" />
+
+        <Button
+            android:id="@+id/button_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:text="delete" />
+
+    </LinearLayout>
 
 </LinearLayout>

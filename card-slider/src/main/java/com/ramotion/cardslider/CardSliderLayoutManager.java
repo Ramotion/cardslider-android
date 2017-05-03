@@ -6,10 +6,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
@@ -36,7 +39,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private int activeCardRight = INVALID_VALUE;
     private int activeCardCenter = INVALID_VALUE;
 
-    private int requestedPosition = INVALID_VALUE;
+    private int scrollRequestedPosition = INVALID_VALUE;
 
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
@@ -51,8 +54,53 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             initialize();
         }
 
+        if (getItemCount() == 0) {
+            removeAndRecycleAllViews(recycler);
+            return;
+        }
+
+        if (getChildCount() == 0 && state.isPreLayout()) {
+            return;
+        }
+
+        final LinkedList<Integer> removedPositions = new LinkedList<>();
+        if (state.isPreLayout()) {
+            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+                final View child = getChildAt(i);
+                final boolean isRemoved = ((RecyclerView.LayoutParams)child.getLayoutParams()).isItemRemoved();
+                if (isRemoved) {
+                    removedPositions.add(getPosition(child));
+                }
+            }
+
+            scrollRequestedPosition = getAnchorPosition();
+            if (removedPositions.contains(scrollRequestedPosition)) {
+                final int last = removedPositions.getLast();
+                final int first = removedPositions.getFirst();
+
+                final int right = Math.min(last, getItemCount() - 1);
+
+                int left = right;
+                if (last != first) {
+                    left = Math.max(first, 0);
+                }
+
+                scrollRequestedPosition = Math.max(left, right);
+            }
+        }
+
         detachAndScrapAttachedViews(recycler);
-        fill(recycler);
+        fill(recycler, state);
+    }
+
+    @Override
+    public boolean supportsPredictiveItemAnimations() {
+        return true;
+    }
+
+    @Override
+    public void onAdapterChanged(RecyclerView.Adapter oldAdapter, RecyclerView.Adapter newAdapter) {
+        removeAllViews();
     }
 
     @Override
@@ -66,13 +114,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             return;
         }
 
-        requestedPosition = position;
+        scrollRequestedPosition = position;
         requestLayout();
     }
 
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
-        requestedPosition = INVALID_VALUE;
+        scrollRequestedPosition = INVALID_VALUE;
 
         int delta;
         if (dx < 0) {
@@ -81,13 +129,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             delta = scrollLeft(dx);
         }
 
-        fill(recycler);
+        fill(recycler, state);
         return delta;
     }
 
     @Override
     public PointF computeScrollVectorForPosition(int targetPosition) {
-        return new PointF(targetPosition - getAnchorPos(), 0);
+        return new PointF(targetPosition - getAnchorPosition(), 0);
     }
 
     @Override
@@ -129,6 +177,14 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         scroller.setTargetPosition(position);
         startSmoothScroll(scroller);
+    }
+
+    @Override
+    public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int count) {
+        final int anchorPos = getAnchorPosition();
+        if (positionStart + count <= anchorPos) {
+            scrollRequestedPosition = anchorPos - 1;
+        }
     }
 
     @Nullable
@@ -308,10 +364,11 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
-    private int getAnchorPos() {
+    private int getAnchorPosition() {
         int result = 0;
-        if (requestedPosition != INVALID_VALUE) {
-            result = requestedPosition;
+
+        if (scrollRequestedPosition != INVALID_VALUE) {
+            result = scrollRequestedPosition;
         } else {
             View biggestView = null;
             float lastScaleX = 0f;
@@ -337,8 +394,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         return result;
     }
 
-    private void fill(RecyclerView.Recycler recycler) {
-        final int anchorPos = getAnchorPos();
+    private void fill(RecyclerView.Recycler recycler, RecyclerView.State state) {
+        final int anchorPos = getAnchorPosition();
 
         viewCache.clear();
 
@@ -352,8 +409,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             detachView(viewCache.valueAt(i));
         }
 
-        fillLeft(anchorPos, recycler);
-        fillRight(anchorPos, recycler);
+        if (!state.isPreLayout()) {
+            fillLeft(anchorPos, recycler);
+            fillRight(anchorPos, recycler);
+        }
 
         for (int i = 0, cnt = viewCache.size(); i < cnt; i++) {
             recycler.recycleView(viewCache.valueAt(i));

@@ -6,7 +6,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
+
+    private final int COUNT = 40;
+    private final ArrayList<Integer> content = new ArrayList<>(COUNT);
+
+    public SliderAdapter() {
+        for (int i = 0; i < COUNT; i++) {
+            content.add(i);
+        }
+    }
 
     @Override
     public SliderCard onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -19,12 +30,21 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     @Override
     public void onBindViewHolder(SliderCard holder, int position) {
-        holder.setContent(position);
+        holder.setContent(content.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 100;
+        return content.size();
+    }
+
+    public void removeItem(int position) {
+        if (position < 0 || position >= getItemCount()) {
+            return;
+        }
+
+        content.remove(position);
+        notifyItemRemoved(position);
     }
 
 }
