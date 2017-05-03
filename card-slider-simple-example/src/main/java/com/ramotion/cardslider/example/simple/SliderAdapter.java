@@ -1,4 +1,4 @@
-package com.ramotion.cardslider;
+package com.ramotion.cardslider.example.simple;
 
 
 import android.support.v7.widget.RecyclerView;
@@ -12,7 +12,7 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
     public SliderCard onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater
                 .from(parent.getContext())
-                .inflate(R.layout.layout_slider_card, parent, false);
+                .inflate(com.ramotion.cardslider.R.layout.layout_slider_card, parent, false);
 
         return new SliderCard(view);
     }

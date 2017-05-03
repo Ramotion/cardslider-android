@@ -1,4 +1,4 @@
-package com.ramotion.cardslider;
+package com.ramotion.cardslider.example.simple;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -11,7 +11,7 @@ class SliderCard extends RecyclerView.ViewHolder {
     SliderCard(View itemView) {
         super(itemView);
 
-        labelNumber = (TextView) itemView.findViewById(R.id.label_number);
+        labelNumber = (TextView) itemView.findViewById(com.ramotion.cardslider.R.id.label_number);
     }
 
     void setContent(int content) {
