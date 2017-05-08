@@ -1,6 +1,7 @@
 package com.ramotion.cardslider;
 
 import android.graphics.PointF;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -63,6 +64,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             return;
         }
 
+        int anchorPos = getAnchorPosition();
+
         final LinkedList<Integer> removedPositions = new LinkedList<>();
         if (state.isPreLayout()) {
             for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
@@ -73,8 +76,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                 }
             }
 
-            scrollRequestedPosition = getAnchorPosition();
-            if (removedPositions.contains(scrollRequestedPosition)) {
+            if (removedPositions.contains(anchorPos)) {
                 final int last = removedPositions.getLast();
                 final int first = removedPositions.getFirst();
 
@@ -85,12 +87,12 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                     left = Math.max(first, 0);
                 }
 
-                scrollRequestedPosition = Math.max(left, right);
+                anchorPos = Math.max(left, right);
             }
         }
 
         detachAndScrapAttachedViews(recycler);
-        fill(recycler, state);
+        fill(anchorPos, recycler, state);
     }
 
     @Override
@@ -129,7 +131,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             delta = scrollLeft(dx);
         }
 
-        fill(recycler, state);
+        fill(getAnchorPosition(), recycler, state);
         return delta;
     }
 
@@ -394,9 +396,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         return result;
     }
 
-    private void fill(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        final int anchorPos = getAnchorPosition();
-
+    private void fill(int anchorPos, RecyclerView.Recycler recycler, RecyclerView.State state) {
         viewCache.clear();
 
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
