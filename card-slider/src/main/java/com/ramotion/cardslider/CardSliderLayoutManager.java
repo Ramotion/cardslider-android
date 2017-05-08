@@ -20,7 +20,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private static final int INVALID_VALUE = -1;
 
-    private static final float VIEW_WIDTH_PERCENT = 0.35f;
+    private static final float CARD_WIDTH_PERCENT = 0.38f;
     private static final float LEFT_BORDER_PERCENT = 0.1f;
     private static final float SCALE_LEFT = 0.7f;
     private static final float SCALE_CENTER = 0.95f;
@@ -231,10 +231,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private void initialize() {
         final int width = getWidth();
-        cardWidth = (int) (width * VIEW_WIDTH_PERCENT);
+        cardWidth = (int) (width * CARD_WIDTH_PERCENT);
 
         activeCardLeft = (int) (width * LEFT_BORDER_PERCENT);
-        activeCardRight = activeCardLeft + (int) (width * VIEW_WIDTH_PERCENT);
+        activeCardRight = activeCardLeft + (int) (width * CARD_WIDTH_PERCENT);
         activeCardCenter = activeCardLeft + ((activeCardRight - activeCardLeft) / 2);
 
         initialized = true;

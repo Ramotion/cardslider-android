@@ -2,6 +2,7 @@ package com.ramotion.cardslider.example.simple;
 
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,20 +11,22 @@ import java.util.ArrayList;
 
 public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
-    private final int COUNT = 40;
-    private final ArrayList<Integer> content = new ArrayList<>(COUNT);
+    private final ArrayList<Integer> content = new ArrayList<>();
 
     public SliderAdapter() {
-        for (int i = 0; i < COUNT; i++) {
-            content.add(i);
-        }
+        content.add(R.drawable.p1);
+        content.add(R.drawable.p2);
+        content.add(R.drawable.p3);
+        content.add(R.drawable.p4);
+        content.add(R.drawable.p5);
+        content.add(R.drawable.p6);
     }
 
     @Override
     public SliderCard onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater
+        final View view = LayoutInflater
                 .from(parent.getContext())
-                .inflate(com.ramotion.cardslider.R.layout.layout_slider_card, parent, false);
+                .inflate(R.layout.layout_slider_card, parent, false);
 
         return new SliderCard(view);
     }
@@ -36,15 +39,6 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
     @Override
     public int getItemCount() {
         return content.size();
-    }
-
-    public void removeItem(int position) {
-        if (position < 0 || position >= getItemCount()) {
-            return;
-        }
-
-        content.remove(position);
-        notifyItemRemoved(position);
     }
 
 }
