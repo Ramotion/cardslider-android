@@ -20,8 +20,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private static final int INVALID_VALUE = -1;
 
-    private static final float CARD_WIDTH_PERCENT = 0.38f;
-    private static final float LEFT_BORDER_PERCENT = 0.1f;
     private static final float SCALE_LEFT = 0.7f;
     private static final float SCALE_CENTER = 0.95f;
     private static final float SCALE_RIGHT = 0.8f;
@@ -31,14 +29,19 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private final SparseArray<View> viewCache = new SparseArray<>();
 
-    private boolean initialized = false;
-
     private int cardWidth = INVALID_VALUE;
     private int activeCardLeft = INVALID_VALUE;
     private int activeCardRight = INVALID_VALUE;
     private int activeCardCenter = INVALID_VALUE;
 
     private int scrollRequestedPosition = INVALID_VALUE;
+
+    public CardSliderLayoutManager(int activeCardLeft, int cardWidth) {
+        this.cardWidth = cardWidth;
+        this.activeCardLeft = activeCardLeft;
+        this.activeCardRight = activeCardLeft + cardWidth;
+        this.activeCardCenter = activeCardLeft + ((this.activeCardRight - activeCardLeft) / 2);
+    }
 
     @Override
     public RecyclerView.LayoutParams generateDefaultLayoutParams() {
@@ -49,10 +52,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-        if (!initialized) {
-            initialize();
-        }
-
         if (getItemCount() == 0) {
             removeAndRecycleAllViews(recycler);
             return;
@@ -204,7 +203,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     @Nullable
-    View getTopView() {
+    public View getTopView() {
         if (getChildCount() == 0) {
             return null;
         }
@@ -225,19 +224,42 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         return result;
     }
 
-    int[] getCardBorders() {
-        return new int[] {activeCardLeft, activeCardCenter, activeCardRight};
+    int getAnchorPosition() {
+        int result = 0;
+
+        if (scrollRequestedPosition != INVALID_VALUE) {
+            result = scrollRequestedPosition;
+        } else {
+            View biggestView = null;
+            float lastScaleX = 0f;
+
+            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+                final View child = getChildAt(i);
+                if (getDecoratedLeft(child) >= activeCardRight) {
+                    continue;
+                }
+
+                final float scaleX = ViewCompat.getScaleX(child);
+                if (lastScaleX < scaleX) {
+                    lastScaleX = scaleX;
+                    biggestView = child;
+                }
+            }
+
+            if (biggestView != null) {
+                result = getPosition(biggestView);
+            }
+        }
+
+        return result;
     }
 
-    private void initialize() {
-        final int width = getWidth();
-        cardWidth = (int) (width * CARD_WIDTH_PERCENT);
+    int getActiveCardLeft() {
+        return activeCardLeft;
+    }
 
-        activeCardLeft = (int) (width * LEFT_BORDER_PERCENT);
-        activeCardRight = activeCardLeft + (int) (width * CARD_WIDTH_PERCENT);
-        activeCardCenter = activeCardLeft + ((activeCardRight - activeCardLeft) / 2);
-
-        initialized = true;
+    int getCardWidth() {
+        return cardWidth;
     }
 
     private int scrollRight(int dx) {
@@ -378,36 +400,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         } else {
             return vewLeft - border;
         }
-    }
-
-    private int getAnchorPosition() {
-        int result = 0;
-
-        if (scrollRequestedPosition != INVALID_VALUE) {
-            result = scrollRequestedPosition;
-        } else {
-            View biggestView = null;
-            float lastScaleX = 0f;
-
-            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-                final View child = getChildAt(i);
-                if (getDecoratedLeft(child) >= activeCardRight) {
-                    continue;
-                }
-
-                final float scaleX = ViewCompat.getScaleX(child);
-                if (lastScaleX < scaleX) {
-                    lastScaleX = scaleX;
-                    biggestView = child;
-                }
-            }
-
-            if (biggestView != null) {
-                result = getPosition(biggestView);
-            }
-        }
-
-        return result;
     }
 
     private void fill(int anchorPos, RecyclerView.Recycler recycler, RecyclerView.State state) {

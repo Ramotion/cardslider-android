@@ -38,6 +38,25 @@ public class CardSnapHelper extends LinearSnapHelper {
     }
 
     @Override
+    public int findTargetSnapPosition(RecyclerView.LayoutManager layoutManager, int velocityX, int velocityY) {
+        final CardSliderLayoutManager lm = (CardSliderLayoutManager) layoutManager;
+
+        final int itemCount = lm.getItemCount();
+        if (itemCount == 0) {
+            return RecyclerView.NO_POSITION;
+        }
+
+        final int currentPosition = lm.getAnchorPosition();
+        final int count = Math.abs((velocityX / 2) / lm.getCardWidth());
+
+        if (currentPosition + count > itemCount) {
+            velocityX = Integer.signum(velocityX) * (itemCount - currentPosition) * lm.getCardWidth();
+        }
+
+        return super.findTargetSnapPosition(layoutManager, velocityX, velocityY);
+    }
+
+    @Override
     public View findSnapView(RecyclerView.LayoutManager layoutManager) {
         return ((CardSliderLayoutManager)layoutManager).getTopView();
     }
@@ -47,14 +66,22 @@ public class CardSnapHelper extends LinearSnapHelper {
                                               @NonNull View targetView)
     {
         final CardSliderLayoutManager lm = (CardSliderLayoutManager)layoutManager;
-        final int[] borders = lm.getCardBorders();
-        final int[] out = new int[] {0, 0};
-        final int viewLeft = lm.getDecoratedLeft(targetView);
 
-        if (viewLeft < borders[1]) {
-            out[0] = viewLeft - borders[0];
+        View view = lm.getTopView();
+        if (view == null) {
+            view = targetView;
+        }
+
+        final int viewLeft = lm.getDecoratedLeft(view);
+        final int activeCardLeft = lm.getActiveCardLeft();
+        final int activeCardCenter = lm.getActiveCardLeft() + lm.getCardWidth() / 2;
+        final int activeCardRight = lm.getActiveCardLeft() + lm.getCardWidth();
+
+        int[] out = new int[] {0, 0};
+        if (viewLeft < activeCardCenter) {
+            out[0] = viewLeft - activeCardLeft;
         } else {
-            out[0] = viewLeft - borders[2];
+            out[0] = viewLeft - activeCardRight;
         }
 
         return out;
