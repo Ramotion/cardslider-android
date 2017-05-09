@@ -5,13 +5,46 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <Space
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:layout_height="38dp"
+        android:layout_marginTop="53dp">
+
+        <FrameLayout
+            android:layout_width="@dimen/active_card_width"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/active_card_left"
+            android:layout_centerVertical="true">
+
+            <TextSwitcher
+                android:id="@+id/ts_country"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="79dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/temperature_background"
+            android:layout_centerVertical="true">
+
+            <TextSwitcher
+                android:id="@+id/ts_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
+
+        </FrameLayout>
+
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="220dp"/>
+        android:layout_height="210dp"
+        android:layout_marginTop="34dp"/>
 
 </LinearLayout>

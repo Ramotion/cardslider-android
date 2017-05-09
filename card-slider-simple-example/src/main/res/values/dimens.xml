@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="active_card_left">40dp</dimen>
+    <dimen name="active_card_width">148dp</dimen>
+
+    <dimen name="country_text_size">20sp</dimen>
+</resources>
