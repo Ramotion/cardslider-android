@@ -46,7 +46,7 @@ public class CardSnapHelper extends LinearSnapHelper {
             return RecyclerView.NO_POSITION;
         }
 
-        final int currentPosition = lm.getAnchorPosition();
+        final int currentPosition = lm.getActiveCardPosition();
         final int count = Math.abs((velocityX / 2) / lm.getCardWidth());
 
         if (currentPosition + count > itemCount) {

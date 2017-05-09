@@ -18,8 +18,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private static final boolean DEBUG = true;
 
-    private static final int INVALID_VALUE = -1;
-
     private static final float SCALE_LEFT = 0.7f;
     private static final float SCALE_CENTER = 0.95f;
     private static final float SCALE_RIGHT = 0.8f;
@@ -29,12 +27,12 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private final SparseArray<View> viewCache = new SparseArray<>();
 
-    private int cardWidth = INVALID_VALUE;
-    private int activeCardLeft = INVALID_VALUE;
-    private int activeCardRight = INVALID_VALUE;
-    private int activeCardCenter = INVALID_VALUE;
+    private int cardWidth;
+    private int activeCardLeft;
+    private int activeCardRight;
+    private int activeCardCenter;
 
-    private int scrollRequestedPosition = INVALID_VALUE;
+    private int scrollRequestedPosition = 0;
 
     public CardSliderLayoutManager(int activeCardLeft, int cardWidth) {
         this.cardWidth = cardWidth;
@@ -61,7 +59,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             return;
         }
 
-        int anchorPos = getAnchorPosition();
+        int anchorPos = getActiveCardPosition();
 
         final LinkedList<Integer> removedPositions = new LinkedList<>();
         if (state.isPreLayout()) {
@@ -119,7 +117,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     @Override
     public int scrollHorizontallyBy(int dx, RecyclerView.Recycler recycler, RecyclerView.State state) {
-        scrollRequestedPosition = INVALID_VALUE;
+        scrollRequestedPosition = RecyclerView.NO_POSITION;
 
         int delta;
         if (dx < 0) {
@@ -128,13 +126,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             delta = scrollLeft(dx);
         }
 
-        fill(getAnchorPosition(), recycler, state);
+        fill(getActiveCardPosition(), recycler, state);
         return delta;
     }
 
     @Override
     public PointF computeScrollVectorForPosition(int targetPosition) {
-        return new PointF(targetPosition - getAnchorPosition(), 0);
+        return new PointF(targetPosition - getActiveCardPosition(), 0);
     }
 
     @Override
@@ -180,7 +178,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     @Override
     public void onItemsRemoved(RecyclerView recyclerView, int positionStart, int count) {
-        final int anchorPos = getAnchorPosition();
+        final int anchorPos = getActiveCardPosition();
         if (positionStart + count <= anchorPos) {
             scrollRequestedPosition = anchorPos - 1;
         }
@@ -189,7 +187,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     @Override
     public Parcelable onSaveInstanceState() {
         SavedState state = new SavedState();
-        state.anchorPos = getAnchorPosition();
+        state.anchorPos = getActiveCardPosition();
         return state;
     }
 
@@ -202,32 +200,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
-    @Nullable
-    public View getTopView() {
-        if (getChildCount() == 0) {
-            return null;
-        }
+    public int getActiveCardPosition() {
+        int result = RecyclerView.NO_POSITION;
 
-        View result = null;
-        float lastZ = 0f;
-
-        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-            final View child = getChildAt(i);
-
-            final float z = ViewCompat.getZ(child);
-            if (lastZ < z) {
-                lastZ = z;
-                result = child;
-            }
-        }
-
-        return result;
-    }
-
-    int getAnchorPosition() {
-        int result = 0;
-
-        if (scrollRequestedPosition != INVALID_VALUE) {
+        if (scrollRequestedPosition != RecyclerView.NO_POSITION) {
             result = scrollRequestedPosition;
         } else {
             View biggestView = null;
@@ -248,6 +224,31 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
             if (biggestView != null) {
                 result = getPosition(biggestView);
+            }
+        }
+
+        return result;
+    }
+
+    @Nullable
+    View getTopView() {
+        if (getChildCount() == 0) {
+            return null;
+        }
+
+        View result = null;
+        float lastZ = 0f;
+
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View child = getChildAt(i);
+            if (getDecoratedLeft(child) >= activeCardRight) {
+                continue;
+            }
+
+            final float z = ViewCompat.getZ(child);
+            if (lastZ < z) {
+                lastZ = z;
+                result = child;
             }
         }
 
@@ -428,7 +429,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     private void fillLeft(int anchorPos, RecyclerView.Recycler recycler) {
-        if (anchorPos == INVALID_VALUE) {
+        if (anchorPos == RecyclerView.NO_POSITION) {
             return;
         }
 
@@ -456,7 +457,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     private void fillRight(int anchorPos, RecyclerView.Recycler recycler) {
-        if (anchorPos == INVALID_VALUE) {
+        if (anchorPos == RecyclerView.NO_POSITION) {
             return;
         }
 
