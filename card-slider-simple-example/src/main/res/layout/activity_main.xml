@@ -47,4 +47,67 @@
         android:layout_height="210dp"
         android:layout_marginTop="34dp"/>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="31dp">
+
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/star"
+            android:scaleType="fitCenter"/>
+
+        <TextSwitcher
+            android:id="@+id/ts_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="@dimen/active_card_left"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="@dimen/active_card_left"
+        android:textSize="15sp"
+        android:text="The coastline is very tortuous, many harbor islands dotted, the largest island in the sea called Crete."/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageSwitcher
+            android:id="@+id/ts_map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="20dp"
+                android:src="@drawable/clock"
+                android:scaleType="fitCenter"/>
+
+            <TextSwitcher
+                android:id="@+id/ts_clock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="@dimen/active_card_left"/>
+
+        </FrameLayout>
+
+    </FrameLayout>
+
 </LinearLayout>

@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@android:color/white</item>
     </style>
 
     <style name="CountryTextView">
@@ -16,6 +17,16 @@
     <style name="TemperatureTextView">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/temperature_text</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="PlaceTextView">
+        <item name="android:textSize">24sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ClockTextView">
+        <item name="android:textSize">15sp</item>
         <item name="android:gravity">center</item>
     </style>
 
