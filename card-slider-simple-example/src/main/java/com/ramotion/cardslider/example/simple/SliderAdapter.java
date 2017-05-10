@@ -2,24 +2,22 @@ package com.ramotion.cardslider.example.simple;
 
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
+class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     private final ArrayList<Integer> content = new ArrayList<>();
+    private final View.OnClickListener listener;
 
-    public SliderAdapter() {
-        content.add(R.drawable.p1);
-        content.add(R.drawable.p2);
-        content.add(R.drawable.p3);
-        content.add(R.drawable.p4);
-        content.add(R.drawable.p5);
-        content.add(R.drawable.p6);
+    SliderAdapter(int[] content, View.OnClickListener listener) {
+        this.listener = listener;
+        for (int aContent : content) {
+            this.content.add(aContent);
+        }
     }
 
     @Override
@@ -27,6 +25,15 @@ public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
         final View view = LayoutInflater
                 .from(parent.getContext())
                 .inflate(R.layout.layout_slider_card, parent, false);
+
+        if (listener != null) {
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    listener.onClick(view);
+                }
+            });
+        }
 
         return new SliderCard(view);
     }

@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_weight="4">
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/image_view"
-        android:transitionName="shared"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"/>
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:transitionName="shared"/>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
-</LinearLayout>
+</FrameLayout>
