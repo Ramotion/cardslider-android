@@ -170,18 +170,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            int imgId;
-            switch (pics[activeCardPosition]) {
-                case R.drawable.p1: imgId = R.drawable.p1_big; break;
-                case R.drawable.p2: imgId = R.drawable.p2_big; break;
-                case R.drawable.p3: imgId = R.drawable.p3_big; break;
-                case R.drawable.p4: imgId = R.drawable.p4_big; break;
-                case R.drawable.p5: imgId = R.drawable.p5_big; break;
-                default: imgId = R.drawable.p1_big;
-            }
-
             final Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, imgId);
+            intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, pics[activeCardPosition]);
 
             if (Build.VERSION.SDK_INT < 21) {
                 startActivity(intent);

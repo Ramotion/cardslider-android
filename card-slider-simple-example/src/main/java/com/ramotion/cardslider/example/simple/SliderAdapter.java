@@ -44,6 +44,11 @@ class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
     }
 
     @Override
+    public void onViewRecycled(SliderCard holder) {
+        holder.clearContent();
+    }
+
+    @Override
     public int getItemCount() {
         return content.size();
     }
