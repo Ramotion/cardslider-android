@@ -11,12 +11,11 @@ import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
-
-    private static final boolean DEBUG = true;
 
     private static final float SCALE_LEFT = 0.7f;
     private static final float SCALE_CENTER = 0.95f;
@@ -26,6 +25,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private static final int LEFT_CARD_COUNT = 2;
 
     private final SparseArray<View> viewCache = new SparseArray<>();
+    private final ArrayList<Integer> cardsXCoords = new ArrayList<>();
 
     private int cardWidth;
     private int activeCardLeft;
@@ -88,6 +88,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         detachAndScrapAttachedViews(recycler);
         fill(anchorPos, recycler, state);
+        if (!cardsXCoords.isEmpty()) {
+            layoutByCoords();
+            cardsXCoords.clear();
+        }
     }
 
     @Override
@@ -127,6 +131,12 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
 
         fill(getActiveCardPosition(), recycler, state);
+
+        cardsXCoords.clear();
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            cardsXCoords.add(getDecoratedLeft(getChildAt(i)));
+        }
+
         return delta;
     }
 
@@ -324,59 +334,43 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private int scrollLeft(int dx) {
         final int childCount = getChildCount();
-
         if (childCount == 0) {
             return 0;
         }
 
-        int delta;
-
         final View lastView = getChildAt(childCount - 1);
         final boolean isLastItem = getPosition(lastView) == getItemCount() - 1;
+        final int delta;
         if (isLastItem) {
             delta = Math.min(dx, getDecoratedRight(lastView) - activeCardRight);
         } else {
             delta = dx;
         }
 
-        final LinkedList<View> leftViews = new LinkedList<>();
-        final LinkedList<View> centerViews = new LinkedList<>();
-
-        for (int i = 0; i < childCount; i++) {
+        lastView.offsetLeftAndRight(-delta);
+        View prevView = lastView;
+        for (int i = childCount - 2; i >= 0; i--) {
             final View view = getChildAt(i);
-            final int viewLeft = getDecoratedLeft(view);
+            final int prevLeft = getDecoratedLeft(prevView);
 
-            if (viewLeft < activeCardLeft) {
-                leftViews.add(view);
-            } else if (viewLeft < activeCardRight) {
-                centerViews.add(view);
-            } else {
-                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, 0));
-            }
-        }
+            if (prevLeft >= activeCardRight) {
+                view.offsetLeftAndRight(-delta);
+            } else if (prevLeft >= activeCardCenter) {
+                break;
+            } else if (prevLeft >= activeCardLeft) {
+                final int step = activeCardLeft / LEFT_CARD_COUNT;
+                int border = activeCardLeft - step;
 
-        if (centerViews.size() >= 2) {
-            final View secondTopCard = centerViews.get(1);
-            final int secondTopCardLeft = getDecoratedLeft(secondTopCard);
-
-            if (secondTopCardLeft <= activeCardCenter) {
-                final View firstTopCard = centerViews.get(0);
-                firstTopCard.offsetLeftAndRight(getAllowedLeftDelta(firstTopCard, delta, 0));
-            }
-            secondTopCard.offsetLeftAndRight(getAllowedLeftDelta(secondTopCard, delta, 0));
-        } else if (!leftViews.isEmpty() && !centerViews.isEmpty()) {
-            for (int i = 0, cnt = leftViews.size(); i < cnt; i++) {
-                int leftBorder = 0;
-                if (i == cnt - 1) {
-                    leftBorder = activeCardLeft / 2;
+                for (int j = i; j >= 0; j--) {
+                    final View jView = getChildAt(j);
+                    jView.offsetLeftAndRight(getAllowedLeftDelta(jView, delta, border));
+                    border -= step;
                 }
-                final View view = getChildAt(i);
-                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, leftBorder));
+
+                break;
             }
 
-            for (View view : centerViews) {
-                view.offsetLeftAndRight(getAllowedLeftDelta(view, delta, activeCardLeft));
-            }
+            prevView = view;
         }
 
         return delta;
@@ -401,6 +395,16 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         } else {
             return vewLeft - border;
         }
+    }
+
+    private void layoutByCoords() {
+        final int count = Math.min(getChildCount(), cardsXCoords.size());
+        for (int i = 0; i < count; i++) {
+            final View view = getChildAt(i);
+            final int viewLeft = cardsXCoords.get(i);
+            layoutDecorated(view, viewLeft, 0, viewLeft + cardWidth, getDecoratedBottom(view));
+        }
+        updateViewScale();
     }
 
     private void fill(int anchorPos, RecyclerView.Recycler recycler, RecyclerView.State state) {
