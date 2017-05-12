@@ -11,7 +11,6 @@ public class DetailsActivity extends AppCompatActivity {
     static String BUNDLE_IMAGE_ID = "BUNDLE_IMAGE_ID";
 
     private DecodeBitmapTask decodeBitmapTask;
-    private Bitmap decodedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +43,6 @@ public class DetailsActivity extends AppCompatActivity {
             protected void onPostExecute(Bitmap bitmap) {
                 super.onPostExecute(bitmap);
                 ((ImageView)findViewById(R.id.image_view)).setImageBitmap(bitmap);
-                decodedBitmap = bitmap;
             }
         };
         decodeBitmapTask.execute();
@@ -54,16 +52,8 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
-        if (isFinishing()) {
-
-            if (decodedBitmap != null) {
-                decodedBitmap.recycle();
-                decodedBitmap = null;
-            }
-
-            if (decodeBitmapTask != null) {
-                decodeBitmapTask.cancel(true);
-            }
+        if (isFinishing() && decodeBitmapTask != null) {
+            decodeBitmapTask.cancel(true);
         }
     }
 }

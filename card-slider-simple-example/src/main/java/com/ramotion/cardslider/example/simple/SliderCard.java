@@ -15,7 +15,6 @@ class SliderCard extends RecyclerView.ViewHolder {
     private final ImageView imageView;
 
     private DecodeBitmapTask task;
-    private Bitmap decodedBitmap;
 
     SliderCard(View itemView) {
         super(itemView);
@@ -40,11 +39,6 @@ class SliderCard extends RecyclerView.ViewHolder {
     }
 
     void clearContent() {
-        if (decodedBitmap != null) {
-            decodedBitmap.recycle();
-            decodedBitmap = null;
-        }
-
         if (task != null) {
             task.cancel(true);
         }
@@ -56,7 +50,6 @@ class SliderCard extends RecyclerView.ViewHolder {
             protected void onPostExecute(Bitmap bitmap) {
                 super.onPostExecute(bitmap);
                 imageView.setImageBitmap(bitmap);
-                decodedBitmap = bitmap;
             }
         };
         task.execute();
