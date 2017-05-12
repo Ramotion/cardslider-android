@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:layout_marginTop="53dp">
+        android:layout_marginTop="30dp">
 
         <FrameLayout
             android:layout_width="@dimen/active_card_width"
@@ -45,12 +45,12 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="210dp"
-        android:layout_marginTop="34dp"/>
+        android:layout_marginTop="20dp"/>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="31dp">
+        android:layout_marginTop="30dp">
 
         <ImageView
             android:layout_width="13dp"
