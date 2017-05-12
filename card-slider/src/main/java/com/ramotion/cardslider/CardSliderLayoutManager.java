@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.view.View;
 
@@ -26,6 +27,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private final SparseArray<View> viewCache = new SparseArray<>();
     private final ArrayList<Integer> cardsXCoords = new ArrayList<>();
+
+    private LinearSmoothScroller smoothScroller;
 
     private int cardWidth;
     private int activeCardLeft;
@@ -151,37 +154,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             return;
         }
 
-        final LinearSmoothScroller scroller = new LinearSmoothScroller(recyclerView.getContext()) {
-            @Override
-            public int calculateDxToMakeVisible(View view, int snapPreference) {
-                final int viewStart = getDecoratedLeft(view);
-                if (viewStart > activeCardLeft) {
-                    return activeCardLeft - viewStart;
-                } else {
-                    int delta = 0;
-                    int topViewPos = 0;
-
-                    final View topView = getTopView();
-                    if (topView != null) {
-                        topViewPos = getPosition(topView);
-                        if (topViewPos != position) {
-                            final int topViewLeft = getDecoratedLeft(topView);
-                            if (topViewLeft >= activeCardLeft && topViewLeft < activeCardRight) {
-                                delta = activeCardRight - topViewLeft;
-                            }
-                        }
-                    }
-
-                    return delta + (cardWidth) * Math.max(0, topViewPos - position - 1);
-                }
-            }
-
-            @Override
-            protected int calculateTimeForDeceleration(int dx) {
-                return 500;
-            }
-        };
-
+        final LinearSmoothScroller scroller = getSmoothScroller(recyclerView);
         scroller.setTargetPosition(position);
         startSmoothScroll(scroller);
     }
@@ -271,6 +244,40 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     int getCardWidth() {
         return cardWidth;
+    }
+
+    LinearSmoothScroller getSmoothScroller(final RecyclerView recyclerView) {
+        return new LinearSmoothScroller(recyclerView.getContext()) {
+            @Override
+            public int calculateDxToMakeVisible(View view, int snapPreference) {
+                final int viewStart = getDecoratedLeft(view);
+                if (viewStart > activeCardLeft) {
+                    return activeCardLeft - viewStart;
+                } else {
+                    int delta = 0;
+                    int topViewPos = 0;
+
+                    final View topView = getTopView();
+                    if (topView != null) {
+                        topViewPos = getPosition(topView);
+                        if (topViewPos != getTargetPosition()) {
+                            final int topViewLeft = getDecoratedLeft(topView);
+                            if (topViewLeft >= activeCardLeft && topViewLeft < activeCardRight) {
+                                delta = activeCardRight - topViewLeft;
+                            }
+                        }
+                    }
+
+                    return delta + (cardWidth) * Math.max(0, topViewPos - getTargetPosition() - 1);
+                }
+            }
+
+            @Override
+            protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                return 0.5f;
+            }
+
+        };
     }
 
     private int scrollRight(int dx) {

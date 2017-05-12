@@ -28,7 +28,6 @@ class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
     protected Bitmap doInBackground(Void... voids) {
         Bitmap cachedBitmap = cache.getBitmapFromBgMemCache(bitmapResId);
         if (cachedBitmap != null) {
-            Log.d("D", "bitmap from cache: " + bitmapResId);
            return cachedBitmap;
         }
 

@@ -10,14 +10,14 @@ import java.util.ArrayList;
 
 class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
-    private final ArrayList<Integer> content = new ArrayList<>();
+    private final int count;
+    private final int[] content;
     private final View.OnClickListener listener;
 
-    SliderAdapter(int[] content, View.OnClickListener listener) {
+    SliderAdapter(int[] content, int count, View.OnClickListener listener) {
+        this.content = content;
+        this.count = count;
         this.listener = listener;
-        for (int aContent : content) {
-            this.content.add(aContent);
-        }
     }
 
     @Override
@@ -40,7 +40,7 @@ class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     @Override
     public void onBindViewHolder(SliderCard holder, int position) {
-        holder.setContent(content.get(position));
+        holder.setContent(content[position % content.length]);
     }
 
     @Override
@@ -50,7 +50,7 @@ class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     @Override
     public int getItemCount() {
-        return content.size();
+        return count;
     }
 
 }

@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private final String[] places = {"Aegeana Sea", "Somewhere on Earth", "Another place"};
     private final String[] times = {"4.11~11.15    7:00~18:00", "3.15~9.15    8:00~16:00", "8.1~12.15    7:00~18:00"};
 
-    private final SliderAdapter sliderAdapter = new SliderAdapter(pics, new OnCardClickListener());
+    private final SliderAdapter sliderAdapter = new SliderAdapter(pics, 20, new OnCardClickListener());
 
     private RecyclerView recyclerView;
     private ImageSwitcher mapSwitcher;
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(sliderAdapter);
         recyclerView.setLayoutManager(new CardSliderLayoutManager(left, width));
         recyclerView.addOnScrollListener(new ScrollListener());
+        recyclerView.setHasFixedSize(true);
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
 
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
                 countrySwitcher.setInAnimation(MainActivity.this, animH[0]);
                 countrySwitcher.setOutAnimation(MainActivity.this, animH[1]);
-                countrySwitcher.setText(countries[pos]);
+                countrySwitcher.setText(countries[pos % countries.length]);
 
                 temperatureSwitcher.setInAnimation(MainActivity.this, animH[0]);
                 temperatureSwitcher.setOutAnimation(MainActivity.this, animH[1]);
@@ -171,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             final Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, pics[activeCardPosition]);
+            intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, pics[activeCardPosition % pics.length]);
 
             if (Build.VERSION.SDK_INT < 21) {
                 startActivity(intent);
