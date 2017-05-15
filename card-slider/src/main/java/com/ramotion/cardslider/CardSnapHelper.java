@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 
 import java.security.InvalidParameterException;
 
@@ -119,7 +120,11 @@ public class CardSnapHelper extends LinearSnapHelper {
             out[0] = viewLeft - activeCardRight;
         }
 
-        return out;
+        if (out[0] != 0) {
+            recyclerView.smoothScrollBy(out[0], 0, new AccelerateInterpolator());
+        }
+
+        return new int[] {0, 0};
     }
 
     @Nullable
@@ -127,4 +132,5 @@ public class CardSnapHelper extends LinearSnapHelper {
     protected LinearSmoothScroller createSnapScroller(RecyclerView.LayoutManager layoutManager) {
         return ((CardSliderLayoutManager)layoutManager).getSmoothScroller(recyclerView);
     }
+
 }
