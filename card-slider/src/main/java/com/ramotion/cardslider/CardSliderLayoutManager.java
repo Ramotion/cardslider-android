@@ -26,7 +26,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private static final int LEFT_CARD_COUNT = 2;
 
     private final SparseArray<View> viewCache = new SparseArray<>();
-    private final ArrayList<Integer> cardsXCoords = new ArrayList<>();
+    private final SparseArray<Integer> cardsXCoords = new SparseArray<>();
 
     private LinearSmoothScroller smoothScroller;
 
@@ -91,9 +91,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         detachAndScrapAttachedViews(recycler);
         fill(anchorPos, recycler, state);
-        if (!cardsXCoords.isEmpty()) {
+        if (cardsXCoords.size() != 0) {
             layoutByCoords();
-            cardsXCoords.clear();
         }
     }
 
@@ -137,7 +136,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         cardsXCoords.clear();
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-            cardsXCoords.add(getDecoratedLeft(getChildAt(i)));
+            final View view = getChildAt(i);
+            cardsXCoords.put(getPosition(view), getDecoratedLeft(view));
         }
 
         return delta;
@@ -408,10 +408,11 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         final int count = Math.min(getChildCount(), cardsXCoords.size());
         for (int i = 0; i < count; i++) {
             final View view = getChildAt(i);
-            final int viewLeft = cardsXCoords.get(i);
+            final int viewLeft = cardsXCoords.get(getPosition(view));
             layoutDecorated(view, viewLeft, 0, viewLeft + cardWidth, getDecoratedBottom(view));
         }
         updateViewScale();
+        cardsXCoords.clear();
     }
 
     private void fill(int anchorPos, RecyclerView.Recycler recycler, RecyclerView.State state) {
