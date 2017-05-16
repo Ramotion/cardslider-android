@@ -23,13 +23,14 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final int[][] dotCoords = new int[5][2];
     private final int[] pics = {R.drawable.p1, R.drawable.p2, R.drawable.p3, R.drawable.p4, R.drawable.p5};
     private final int[] maps = {R.drawable.map_1, R.drawable.map_2, R.drawable.map_3};
-    private final String[] countries = {"GREECE", "FRANCE", "CHINA", "CANADA", "JAPAN"};
+    private final int[] descriptions = {R.string.text1, R.string.text2, R.string.text3, R.string.text4, R.string.text5};
+    private final String[] countries = {"FRANCE", "KOREA", "ENGLAND", "CHINA", "GREECE"};
+    private final String[] places = {"The Louvre", "Gwanghwamun", "Tower Bridge", "Temple of Heaven", "Aegeana Sea"};
     private final String[] temperatures = {"8~21°C", "6~19°C", "5~17°C"};
-    private final String[] places = {"Aegeana Sea", "Somewhere on Earth", "Another place"};
     private final String[] times = {"4.11~11.15    7:00~18:00", "3.15~9.15    8:00~16:00", "8.1~12.15    7:00~18:00"};
-    private final int[][] dotCoords = new int[5][2];
 
     private final SliderAdapter sliderAdapter = new SliderAdapter(pics, 20, new OnCardClickListener());
 
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     private TextSwitcher temperatureSwitcher;
     private TextSwitcher placeSwitcher;
     private TextSwitcher clockSwitcher;
+    private TextSwitcher descriptionsSwitcher;
     private View greenDot;
 
     private int currentPosition = 0;
@@ -75,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
         clockSwitcher.setFactory(new TextViewFactory(R.style.ClockTextView));
         clockSwitcher.setCurrentText(times[0]);
 
+        descriptionsSwitcher = (TextSwitcher) findViewById(R.id.ts_description);
+        descriptionsSwitcher.setInAnimation(this, android.R.anim.fade_in);
+        descriptionsSwitcher.setOutAnimation(this, android.R.anim.fade_out);
+        descriptionsSwitcher.setFactory(new TextViewFactory(R.style.DescriptionTextView));
+        descriptionsSwitcher.setCurrentText(getString(descriptions[0]));
+
         mapSwitcher = (ImageSwitcher) findViewById(R.id.ts_map);
         mapSwitcher.setInAnimation(this, android.R.anim.fade_in);
         mapSwitcher.setOutAnimation(this, android.R.anim.fade_out);
@@ -89,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                 final int viewLeft = mapSwitcher.getLeft();
                 final int viewTop = mapSwitcher.getTop();
 
-                final int border = 20;
+                final int border = 100;
                 final int xRange = mapSwitcher.getWidth() - border * 2;
                 final int yRange = mapSwitcher.getHeight() - border * 2;
                 final Random rnd = new Random();
@@ -174,6 +182,8 @@ public class MainActivity extends AppCompatActivity {
                 clockSwitcher.setInAnimation(MainActivity.this, animV[0]);
                 clockSwitcher.setOutAnimation(MainActivity.this, animV[1]);
                 clockSwitcher.setText(times[pos % times.length]);
+
+                descriptionsSwitcher.setText(getString(descriptions[pos % descriptions.length]));
 
                 mapSwitcher.setImageResource(maps[pos % maps.length]);
 

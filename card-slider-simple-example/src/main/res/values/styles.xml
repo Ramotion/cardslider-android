@@ -28,4 +28,10 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="DescriptionTextView">
+        <item name="android:textSize">15sp</item>
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
 </resources>

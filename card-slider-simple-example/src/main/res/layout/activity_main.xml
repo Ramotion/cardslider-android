@@ -69,13 +69,12 @@
 
     </FrameLayout>
 
-    <TextView
+    <TextSwitcher
+        android:id="@+id/ts_description"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="@dimen/active_card_left"
-        android:textSize="15sp"
-        android:text="The coastline is very tortuous, many harbor islands dotted, the largest island in the sea called Crete."/>
+        android:layout_marginStart="@dimen/active_card_left"/>
 
     <FrameLayout
         android:layout_width="match_parent"
