@@ -160,8 +160,8 @@ public class MainActivity extends AppCompatActivity {
                 int animV[] = new int[] {R.anim.slide_in_top, R.anim.slide_out_bottom};
 
                 if (pos < currentPosition) {
-                    animH[0] = android.R.anim.slide_in_left;
-                    animH[1] = android.R.anim.slide_out_right;
+                    animH[0] = R.anim.slide_in_left;
+                    animH[1] = R.anim.slide_out_right;
 
                     animV[0] = R.anim.slide_in_bottom;
                     animV[1] = R.anim.slide_out_top;
@@ -212,19 +212,19 @@ public class MainActivity extends AppCompatActivity {
             }
 
             final int clickedPosition = recyclerView.getChildAdapterPosition(view);
-            if (clickedPosition != activeCardPosition) {
-                return;
-            }
+            if (clickedPosition == activeCardPosition) {
+                final Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+                intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, pics[activeCardPosition % pics.length]);
 
-            final Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-            intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, pics[activeCardPosition % pics.length]);
-
-            if (Build.VERSION.SDK_INT < 21) {
-                startActivity(intent);
-            } else {
-                final ActivityOptions options = ActivityOptions
-                        .makeSceneTransitionAnimation(MainActivity.this, view, "shared");
-                startActivity(intent, options.toBundle());
+                if (Build.VERSION.SDK_INT < 21) {
+                    startActivity(intent);
+                } else {
+                    final ActivityOptions options = ActivityOptions
+                            .makeSceneTransitionAnimation(MainActivity.this, view, "shared");
+                    startActivity(intent, options.toBundle());
+                }
+            } else if (clickedPosition > activeCardPosition) {
+                recyclerView.smoothScrollToPosition(clickedPosition);
             }
         }
     }
