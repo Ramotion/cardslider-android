@@ -10,9 +10,9 @@ import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
@@ -26,9 +26,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private static final int LEFT_CARD_COUNT = 2;
 
     private final SparseArray<View> viewCache = new SparseArray<>();
-    private final SparseArray<Integer> cardsXCoords = new SparseArray<>();
-
-    private LinearSmoothScroller smoothScroller;
+    private final SparseIntArray cardsXCoords = new SparseIntArray();
 
     private int cardWidth;
     private int activeCardLeft;
