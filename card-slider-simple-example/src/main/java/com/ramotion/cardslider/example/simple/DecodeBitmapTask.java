@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.annotation.DrawableRes;
-import android.util.Log;
 
 
 class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {

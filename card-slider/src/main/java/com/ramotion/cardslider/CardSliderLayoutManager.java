@@ -28,10 +28,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private final SparseArray<View> viewCache = new SparseArray<>();
     private final SparseIntArray cardsXCoords = new SparseIntArray();
 
-    private int cardWidth;
-    private int activeCardLeft;
-    private int activeCardRight;
-    private int activeCardCenter;
+    private final int cardWidth;
+    private final int activeCardLeft;
+    private final int activeCardRight;
+    private final int activeCardCenter;
 
     private int scrollRequestedPosition = 0;
 

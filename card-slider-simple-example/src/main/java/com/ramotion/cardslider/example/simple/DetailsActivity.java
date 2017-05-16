@@ -11,7 +11,7 @@ import android.widget.ImageView;
 
 public class DetailsActivity extends AppCompatActivity {
 
-    static String BUNDLE_IMAGE_ID = "BUNDLE_IMAGE_ID";
+    static final String BUNDLE_IMAGE_ID = "BUNDLE_IMAGE_ID";
 
     private ImageView imageView;
     private DecodeBitmapTask decodeBitmapTask;

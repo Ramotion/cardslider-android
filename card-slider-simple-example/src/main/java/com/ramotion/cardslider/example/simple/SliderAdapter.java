@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     private final int count;
