@@ -74,7 +74,8 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="@dimen/active_card_left"/>
+        android:layout_marginStart="@dimen/active_card_left"
+        android:layout_marginEnd="10dp"/>
 
     <FrameLayout
         android:layout_width="match_parent"

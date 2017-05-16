@@ -8,6 +8,7 @@ import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageSwitcher;
@@ -62,25 +63,25 @@ public class MainActivity extends AppCompatActivity {
         new CardSnapHelper().attachToRecyclerView(recyclerView);
 
         countrySwitcher = (TextSwitcher) findViewById(R.id.ts_country);
-        countrySwitcher.setFactory(new TextViewFactory(R.style.CountryTextView));
+        countrySwitcher.setFactory(new TextViewFactory(R.style.CountryTextView, true));
         countrySwitcher.setCurrentText(countries[0]);
 
         temperatureSwitcher = (TextSwitcher) findViewById(R.id.ts_temperature);
-        temperatureSwitcher.setFactory(new TextViewFactory(R.style.TemperatureTextView));
+        temperatureSwitcher.setFactory(new TextViewFactory(R.style.TemperatureTextView, true));
         temperatureSwitcher.setCurrentText(temperatures[0]);
 
         placeSwitcher = (TextSwitcher) findViewById(R.id.ts_place);
-        placeSwitcher.setFactory(new TextViewFactory(R.style.PlaceTextView));
+        placeSwitcher.setFactory(new TextViewFactory(R.style.PlaceTextView, false));
         placeSwitcher.setCurrentText(places[0]);
 
         clockSwitcher = (TextSwitcher) findViewById(R.id.ts_clock);
-        clockSwitcher.setFactory(new TextViewFactory(R.style.ClockTextView));
+        clockSwitcher.setFactory(new TextViewFactory(R.style.ClockTextView, false));
         clockSwitcher.setCurrentText(times[0]);
 
         descriptionsSwitcher = (TextSwitcher) findViewById(R.id.ts_description);
         descriptionsSwitcher.setInAnimation(this, android.R.anim.fade_in);
         descriptionsSwitcher.setOutAnimation(this, android.R.anim.fade_out);
-        descriptionsSwitcher.setFactory(new TextViewFactory(R.style.DescriptionTextView));
+        descriptionsSwitcher.setFactory(new TextViewFactory(R.style.DescriptionTextView, false));
         descriptionsSwitcher.setCurrentText(getString(descriptions[0]));
 
         mapSwitcher = (ImageSwitcher) findViewById(R.id.ts_map);
@@ -117,15 +118,22 @@ public class MainActivity extends AppCompatActivity {
     private class TextViewFactory implements  ViewSwitcher.ViewFactory {
 
         @StyleRes final int styleId;
+        final boolean center;
 
-        TextViewFactory(@StyleRes int styleId) {
+        TextViewFactory(@StyleRes int styleId, boolean center) {
             this.styleId = styleId;
+            this.center = center;
         }
 
         @SuppressWarnings("deprecation")
         @Override
         public View makeView() {
             final TextView textView = new TextView(MainActivity.this);
+
+            if (center) {
+                textView.setGravity(Gravity.CENTER);
+            }
+
             if (Build.VERSION.SDK_INT < 23) {
                 textView.setTextAppearance(MainActivity.this, styleId);
             } else {
