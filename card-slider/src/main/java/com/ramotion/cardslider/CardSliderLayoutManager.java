@@ -25,6 +25,12 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private static final float SCALE_CENTER_TO_RIGHT = SCALE_CENTER - SCALE_RIGHT;
     private static final int LEFT_CARD_COUNT = 2;
 
+    private static final int Z_LEFT_1 = 4;
+    private static final int Z_LEFT_2 = 6;
+    private static final int Z_CENTER_1 = 12;
+    private static final int Z_CENTER_2 = 16;
+    private static final int Z_RIGHT = 8;
+
     private final SparseArray<View> viewCache = new SparseArray<>();
     private final SparseIntArray cardsXCoords = new SparseIntArray();
 
@@ -509,26 +515,26 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                 ViewCompat.setScaleY(view, scale);
                 ViewCompat.setAlpha(view, 0.1f + ratio);
                 if (viewLeft < activeCardLeft / 2) {
-                    ViewCompat.setZ(view, 4);
+                    ViewCompat.setZ(view, Z_LEFT_1);
                 } else {
-                    ViewCompat.setZ(view, 6);
+                    ViewCompat.setZ(view, Z_LEFT_2);
                 }
             } else if (viewLeft < activeCardCenter) {
                 ViewCompat.setScaleX(view, SCALE_CENTER);
                 ViewCompat.setScaleY(view, SCALE_CENTER);
-                ViewCompat.setZ(view, 12); // TODO: move to contants
+                ViewCompat.setZ(view, Z_CENTER_1);
                 ViewCompat.setAlpha(view, 1);
             } else if (viewLeft < activeCardRight) {
                 final float ratio = (float) (viewLeft - activeCardCenter) / (activeCardRight - activeCardCenter);
                 final float scale = SCALE_CENTER - SCALE_CENTER_TO_RIGHT * ratio;
                 ViewCompat.setScaleX(view, scale);
                 ViewCompat.setScaleY(view, scale);
-                ViewCompat.setZ(view, 16); // TODO: move to contants
+                ViewCompat.setZ(view, Z_CENTER_2);
                 ViewCompat.setAlpha(view, 1);
             } else if (viewLeft >= activeCardRight) {
                 ViewCompat.setScaleX(view, SCALE_RIGHT);
                 ViewCompat.setScaleY(view, SCALE_RIGHT);
-                ViewCompat.setZ(view, 8); // TODO: move to contants
+                ViewCompat.setZ(view, Z_RIGHT);
                 ViewCompat.setAlpha(view, 1);
             }
         }
