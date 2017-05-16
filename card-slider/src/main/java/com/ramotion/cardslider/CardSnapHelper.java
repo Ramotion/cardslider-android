@@ -71,6 +71,9 @@ public class CardSnapHelper extends LinearSnapHelper {
             deltaJump = (int) Math.ceil(distance / lm.getCardWidth());
         }
 
+        final int deltaSign = Integer.signum(deltaJump);
+        deltaJump = deltaSign * Math.min(3, Math.abs(deltaJump));
+
         if (vectorForEnd.x < 0) {
             deltaJump = -deltaJump;
         }
