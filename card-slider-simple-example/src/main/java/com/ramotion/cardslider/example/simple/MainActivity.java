@@ -1,5 +1,7 @@
 package com.ramotion.cardslider.example.simple;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
@@ -37,35 +39,43 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private ImageSwitcher mapSwitcher;
-    private TextSwitcher countrySwitcher;
     private TextSwitcher temperatureSwitcher;
     private TextSwitcher placeSwitcher;
     private TextSwitcher clockSwitcher;
     private TextSwitcher descriptionsSwitcher;
     private View greenDot;
 
-    private int currentPosition = 0;
+    private TextView country1TextView;
+    private TextView country2TextView;
+    private int countryOffset1;
+    private int countryOffset2;
+    private long countryAnimDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        initRecyclerView();
+        initCountryText();
+        initSwitchers();
+        initGreenDot();
+    }
+
+    private void initRecyclerView() {
         final int left = getResources().getDimensionPixelSize(R.dimen.active_card_left);
         final int width = getResources().getDimensionPixelSize(R.dimen.active_card_width);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(sliderAdapter);
         recyclerView.setLayoutManager(new CardSliderLayoutManager(left, width));
-        recyclerView.addOnScrollListener(new ScrollListener());
         recyclerView.setHasFixedSize(true);
+        recyclerView.addOnScrollListener(new ScrollListener());
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
+    }
 
-        countrySwitcher = (TextSwitcher) findViewById(R.id.ts_country);
-        countrySwitcher.setFactory(new TextViewFactory(R.style.CountryTextView, true));
-        countrySwitcher.setCurrentText(countries[0]);
-
+    private void initSwitchers() {
         temperatureSwitcher = (TextSwitcher) findViewById(R.id.ts_temperature);
         temperatureSwitcher.setFactory(new TextViewFactory(R.style.TemperatureTextView, true));
         temperatureSwitcher.setCurrentText(temperatures[0]);
@@ -89,7 +99,22 @@ public class MainActivity extends AppCompatActivity {
         mapSwitcher.setOutAnimation(this, android.R.anim.fade_out);
         mapSwitcher.setFactory(new ImageViewFactory());
         mapSwitcher.setImageResource(maps[0]);
+    }
 
+    private void initCountryText() {
+        countryAnimDuration = getResources().getInteger(R.integer.labels_animation_duration);
+        countryOffset1 = getResources().getDimensionPixelSize(R.dimen.active_card_left);
+        countryOffset2 = getResources().getDimensionPixelSize(R.dimen.active_card_width);
+        country1TextView = (TextView) findViewById(R.id.tv_country_1);
+        country2TextView = (TextView) findViewById(R.id.tv_country_2);
+
+        country1TextView.setX(countryOffset1);
+        country2TextView.setX(countryOffset2);
+        country1TextView.setText(countries[0]);
+        country2TextView.setAlpha(0f);
+    }
+
+    private void initGreenDot() {
         mapSwitcher.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -113,6 +138,39 @@ public class MainActivity extends AppCompatActivity {
                 greenDot.setY(dotCoords[0][1]);
             }
         });
+    }
+
+    private void setCountryText(String text, boolean left2right) {
+        final TextView invisibleText;
+        final TextView visibleText;
+        if (country1TextView.getAlpha() > country2TextView.getAlpha()) {
+            visibleText = country1TextView;
+            invisibleText = country2TextView;
+        } else {
+            visibleText = country2TextView;
+            invisibleText = country1TextView;
+        }
+
+        final int vOffset;
+        if (left2right) {
+            invisibleText.setX(0);
+            vOffset = countryOffset2;
+        } else {
+            invisibleText.setX(countryOffset2);
+            vOffset = 0;
+        }
+
+        invisibleText.setText(text);
+
+        final ObjectAnimator iAlpha = ObjectAnimator.ofFloat(invisibleText, "alpha", 1f);
+        final ObjectAnimator vAlpha = ObjectAnimator.ofFloat(visibleText, "alpha", 0f);
+        final ObjectAnimator iX = ObjectAnimator.ofFloat(invisibleText, "x", countryOffset1);
+        final ObjectAnimator vX = ObjectAnimator.ofFloat(visibleText, "x", vOffset);
+
+        final AnimatorSet animSet = new AnimatorSet();
+        animSet.playTogether(iAlpha, vAlpha, iX, vX);
+        animSet.setDuration(countryAnimDuration);
+        animSet.start();
     }
 
     private class TextViewFactory implements  ViewSwitcher.ViewFactory {
@@ -155,6 +213,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ScrollListener extends RecyclerView.OnScrollListener {
+
+        private int currentPosition;
+
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
             if (newState != RecyclerView.SCROLL_STATE_IDLE) {
@@ -163,45 +224,47 @@ public class MainActivity extends AppCompatActivity {
 
             final CardSliderLayoutManager lm = ((CardSliderLayoutManager) recyclerView.getLayoutManager());
             final int pos = lm.getActiveCardPosition();
-            if (pos != currentPosition) {
-                int animH[] = new int[] {R.anim.slide_in_right, R.anim.slide_out_left};
-                int animV[] = new int[] {R.anim.slide_in_top, R.anim.slide_out_bottom};
 
-                if (pos < currentPosition) {
-                    animH[0] = R.anim.slide_in_left;
-                    animH[1] = R.anim.slide_out_right;
-
-                    animV[0] = R.anim.slide_in_bottom;
-                    animV[1] = R.anim.slide_out_top;
-                }
-
-                countrySwitcher.setInAnimation(MainActivity.this, animH[0]);
-                countrySwitcher.setOutAnimation(MainActivity.this, animH[1]);
-                countrySwitcher.setText(countries[pos % countries.length]);
-
-                temperatureSwitcher.setInAnimation(MainActivity.this, animH[0]);
-                temperatureSwitcher.setOutAnimation(MainActivity.this, animH[1]);
-                temperatureSwitcher.setText(temperatures[pos % temperatures.length]);
-
-                placeSwitcher.setInAnimation(MainActivity.this, animV[0]);
-                placeSwitcher.setOutAnimation(MainActivity.this, animV[1]);
-                placeSwitcher.setText(places[pos % places.length]);
-
-                clockSwitcher.setInAnimation(MainActivity.this, animV[0]);
-                clockSwitcher.setOutAnimation(MainActivity.this, animV[1]);
-                clockSwitcher.setText(times[pos % times.length]);
-
-                descriptionsSwitcher.setText(getString(descriptions[pos % descriptions.length]));
-
-                mapSwitcher.setImageResource(maps[pos % maps.length]);
-
-                ViewCompat.animate(greenDot)
-                        .translationX(dotCoords[pos % dotCoords.length][0])
-                        .translationY(dotCoords[pos % dotCoords.length][1])
-                        .start();
-
-                currentPosition = pos;
+            if (pos == RecyclerView.NO_POSITION || currentPosition == pos) {
+                return;
             }
+
+            int animH[] = new int[] {R.anim.slide_in_right, R.anim.slide_out_left};
+            int animV[] = new int[] {R.anim.slide_in_top, R.anim.slide_out_bottom};
+
+            final boolean left2right = pos < currentPosition;
+            if (left2right) {
+                animH[0] = R.anim.slide_in_left;
+                animH[1] = R.anim.slide_out_right;
+
+                animV[0] = R.anim.slide_in_bottom;
+                animV[1] = R.anim.slide_out_top;
+            }
+
+            setCountryText(countries[pos % countries.length], left2right);
+
+            temperatureSwitcher.setInAnimation(MainActivity.this, animH[0]);
+            temperatureSwitcher.setOutAnimation(MainActivity.this, animH[1]);
+            temperatureSwitcher.setText(temperatures[pos % temperatures.length]);
+
+            placeSwitcher.setInAnimation(MainActivity.this, animV[0]);
+            placeSwitcher.setOutAnimation(MainActivity.this, animV[1]);
+            placeSwitcher.setText(places[pos % places.length]);
+
+            clockSwitcher.setInAnimation(MainActivity.this, animV[0]);
+            clockSwitcher.setOutAnimation(MainActivity.this, animV[1]);
+            clockSwitcher.setText(times[pos % times.length]);
+
+            descriptionsSwitcher.setText(getString(descriptions[pos % descriptions.length]));
+
+            mapSwitcher.setImageResource(maps[pos % maps.length]);
+
+            ViewCompat.animate(greenDot)
+                    .translationX(dotCoords[pos % dotCoords.length][0])
+                    .translationY(dotCoords[pos % dotCoords.length][1])
+                    .start();
+
+            currentPosition = pos;
         }
     }
 

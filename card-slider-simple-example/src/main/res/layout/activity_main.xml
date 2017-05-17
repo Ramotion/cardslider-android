@@ -11,16 +11,26 @@
         android:layout_marginTop="30dp">
 
         <FrameLayout
+            android:id="@+id/countries"
             android:layout_width="@dimen/active_card_width"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/active_card_left"
-            android:layout_centerVertical="true">
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/frameLayout">
 
-            <TextSwitcher
-                android:id="@+id/ts_country"
+            <TextView
+                android:id="@+id/tv_country_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:textSize="28sp"
+                android:layout_gravity="center_vertical"/>
+
+            <TextView
+                android:id="@+id/tv_country_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:layout_gravity="center_vertical"/>
 
         </FrameLayout>
 
@@ -29,7 +39,8 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:background="@drawable/temperature_background"
-            android:layout_centerVertical="true">
+            android:layout_centerVertical="true"
+            android:id="@+id/frameLayout">
 
             <TextSwitcher
                 android:id="@+id/ts_temperature"

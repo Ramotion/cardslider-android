@@ -7,11 +7,6 @@
         <item name="android:colorBackground">@android:color/white</item>
     </style>
 
-    <style name="CountryTextView">
-        <item name="android:textSize">28sp</item>
-         <item name="android:gravity">center</item>
-    </style>
-
     <style name="TemperatureTextView">
         <item name="android:textSize">18sp</item>
         <item name="android:textColor">@color/temperature_text</item>
