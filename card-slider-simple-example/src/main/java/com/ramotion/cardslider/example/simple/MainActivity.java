@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final SliderAdapter sliderAdapter = new SliderAdapter(pics, 20, new OnCardClickListener());
 
+    private CardSliderLayoutManager layoutManger;
     private RecyclerView recyclerView;
     private ImageSwitcher mapSwitcher;
     private TextSwitcher temperatureSwitcher;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private int countryOffset1;
     private int countryOffset2;
     private long countryAnimDuration;
+    private int currentPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +70,19 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(sliderAdapter);
-        recyclerView.setLayoutManager(new CardSliderLayoutManager(left, width));
         recyclerView.setHasFixedSize(true);
-        recyclerView.addOnScrollListener(new ScrollListener());
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    onActiveCardChange();
+                }
+            }
+        });
+
+        layoutManger = new CardSliderLayoutManager(left, width);
+        recyclerView.setLayoutManager(layoutManger);
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
     }
@@ -173,6 +185,54 @@ public class MainActivity extends AppCompatActivity {
         animSet.start();
     }
 
+    private void onActiveCardChange() {
+        final int pos = layoutManger.getActiveCardPosition();
+        if (pos == RecyclerView.NO_POSITION || pos == currentPosition) {
+            return;
+        }
+
+        onActiveCardChange(pos);
+    }
+
+    private void onActiveCardChange(int pos) {
+        int animH[] = new int[] {R.anim.slide_in_right, R.anim.slide_out_left};
+        int animV[] = new int[] {R.anim.slide_in_top, R.anim.slide_out_bottom};
+
+        final boolean left2right = pos < currentPosition;
+        if (left2right) {
+            animH[0] = R.anim.slide_in_left;
+            animH[1] = R.anim.slide_out_right;
+
+            animV[0] = R.anim.slide_in_bottom;
+            animV[1] = R.anim.slide_out_top;
+        }
+
+        setCountryText(countries[pos % countries.length], left2right);
+
+        temperatureSwitcher.setInAnimation(MainActivity.this, animH[0]);
+        temperatureSwitcher.setOutAnimation(MainActivity.this, animH[1]);
+        temperatureSwitcher.setText(temperatures[pos % temperatures.length]);
+
+        placeSwitcher.setInAnimation(MainActivity.this, animV[0]);
+        placeSwitcher.setOutAnimation(MainActivity.this, animV[1]);
+        placeSwitcher.setText(places[pos % places.length]);
+
+        clockSwitcher.setInAnimation(MainActivity.this, animV[0]);
+        clockSwitcher.setOutAnimation(MainActivity.this, animV[1]);
+        clockSwitcher.setText(times[pos % times.length]);
+
+        descriptionsSwitcher.setText(getString(descriptions[pos % descriptions.length]));
+
+        mapSwitcher.setImageResource(maps[pos % maps.length]);
+
+        ViewCompat.animate(greenDot)
+                .translationX(dotCoords[pos % dotCoords.length][0])
+                .translationY(dotCoords[pos % dotCoords.length][1])
+                .start();
+
+        currentPosition = pos;
+    }
+
     private class TextViewFactory implements  ViewSwitcher.ViewFactory {
 
         @StyleRes final int styleId;
@@ -212,62 +272,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class ScrollListener extends RecyclerView.OnScrollListener {
-
-        private int currentPosition;
-
-        @Override
-        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-            if (newState != RecyclerView.SCROLL_STATE_IDLE) {
-                return;
-            }
-
-            final CardSliderLayoutManager lm = ((CardSliderLayoutManager) recyclerView.getLayoutManager());
-            final int pos = lm.getActiveCardPosition();
-
-            if (pos == RecyclerView.NO_POSITION || currentPosition == pos) {
-                return;
-            }
-
-            int animH[] = new int[] {R.anim.slide_in_right, R.anim.slide_out_left};
-            int animV[] = new int[] {R.anim.slide_in_top, R.anim.slide_out_bottom};
-
-            final boolean left2right = pos < currentPosition;
-            if (left2right) {
-                animH[0] = R.anim.slide_in_left;
-                animH[1] = R.anim.slide_out_right;
-
-                animV[0] = R.anim.slide_in_bottom;
-                animV[1] = R.anim.slide_out_top;
-            }
-
-            setCountryText(countries[pos % countries.length], left2right);
-
-            temperatureSwitcher.setInAnimation(MainActivity.this, animH[0]);
-            temperatureSwitcher.setOutAnimation(MainActivity.this, animH[1]);
-            temperatureSwitcher.setText(temperatures[pos % temperatures.length]);
-
-            placeSwitcher.setInAnimation(MainActivity.this, animV[0]);
-            placeSwitcher.setOutAnimation(MainActivity.this, animV[1]);
-            placeSwitcher.setText(places[pos % places.length]);
-
-            clockSwitcher.setInAnimation(MainActivity.this, animV[0]);
-            clockSwitcher.setOutAnimation(MainActivity.this, animV[1]);
-            clockSwitcher.setText(times[pos % times.length]);
-
-            descriptionsSwitcher.setText(getString(descriptions[pos % descriptions.length]));
-
-            mapSwitcher.setImageResource(maps[pos % maps.length]);
-
-            ViewCompat.animate(greenDot)
-                    .translationX(dotCoords[pos % dotCoords.length][0])
-                    .translationY(dotCoords[pos % dotCoords.length][1])
-                    .start();
-
-            currentPosition = pos;
-        }
-    }
-
     private class OnCardClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -296,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else if (clickedPosition > activeCardPosition) {
                 recyclerView.smoothScrollToPosition(clickedPosition);
+                onActiveCardChange(clickedPosition);
             }
         }
     }

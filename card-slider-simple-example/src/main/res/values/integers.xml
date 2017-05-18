@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="labels_animation_duration">250</integer>
+    <integer name="labels_animation_duration">350</integer>
 </resources>
