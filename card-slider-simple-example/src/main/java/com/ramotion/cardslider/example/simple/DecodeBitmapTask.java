@@ -55,6 +55,7 @@ class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
 
         options.inSampleSize = inSampleSize;
         options.inJustDecodeBounds = false;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
 
         final Bitmap decodedBitmap = BitmapFactory.decodeResource(resources, bitmapResId, options);
         cache.addBitmapToBgMemoryCache(bitmapResId, decodedBitmap);
