@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.transition.Transition;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.ImageView;
 
 public class DetailsActivity extends AppCompatActivity {
@@ -29,6 +30,13 @@ public class DetailsActivity extends AppCompatActivity {
 
         imageView = (ImageView)findViewById(R.id.image);
         imageView.setImageResource(smallResId);
+
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DetailsActivity.super.onBackPressed();
+            }
+        });
 
         if (Build.VERSION.SDK_INT < 21) {
             loadFullSizeBitmap(smallResId);
