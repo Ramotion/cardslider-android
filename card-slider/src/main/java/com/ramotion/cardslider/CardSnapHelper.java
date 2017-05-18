@@ -83,13 +83,13 @@ public class CardSnapHelper extends LinearSnapHelper {
         }
 
         final int currentPosition = lm.getActiveCardPosition();
-        int targetPos = currentPosition + deltaJump;
-
-        if (targetPos < 0) {
-            targetPos = 0;
+        if (currentPosition == RecyclerView.NO_POSITION) {
+            return RecyclerView.NO_POSITION;
         }
-        if (targetPos >= itemCount) {
-            targetPos = itemCount - 1;
+
+        int targetPos = currentPosition + deltaJump;
+        if (targetPos < 0 || targetPos >= itemCount) {
+            targetPos = RecyclerView.NO_POSITION;
         }
 
         return targetPos;
