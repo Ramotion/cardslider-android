@@ -68,8 +68,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         int anchorPos = getActiveCardPosition();
 
-        final LinkedList<Integer> removedPositions = new LinkedList<>();
         if (state.isPreLayout()) {
+            final LinkedList<Integer> removedPositions = new LinkedList<>();
             for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
                 final View child = getChildAt(i);
                 final boolean isRemoved = ((RecyclerView.LayoutParams)child.getLayoutParams()).isItemRemoved();
