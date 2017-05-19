@@ -1,5 +1,6 @@
 package com.ramotion.cardslider.example.simple;
 
+import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,16 +43,27 @@ public class DetailsActivity extends AppCompatActivity {
             loadFullSizeBitmap(smallResId);
         } else {
             getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {
-                @Override public void onTransitionStart(Transition transition) {
-                    boolean isClosing = decodeBitmapTask != null;
-                    if (isClosing) {
-                        ((CardView)findViewById(R.id.card)).setRadius(15f);
-                    }
-                }
+
+                private boolean isClosing = false;
+
                 @Override public void onTransitionPause(Transition transition) {}
                 @Override public void onTransitionResume(Transition transition) {}
-                @Override public void onTransitionEnd(Transition transition) { loadFullSizeBitmap(smallResId);}
-                @Override public void onTransitionCancel(Transition transition) { loadFullSizeBitmap(smallResId);}
+                @Override public void onTransitionCancel(Transition transition) {}
+
+                @Override public void onTransitionStart(Transition transition) {
+                    if (isClosing) {
+                        addCardCorners();
+                    }
+                }
+
+                @Override public void onTransitionEnd(Transition transition) {
+                    if (!isClosing) {
+                        isClosing = true;
+
+                        removeCardCorners();
+                        loadFullSizeBitmap(smallResId);
+                    }
+                }
             });
         }
     }
@@ -63,6 +75,16 @@ public class DetailsActivity extends AppCompatActivity {
         if (isFinishing() && decodeBitmapTask != null) {
             decodeBitmapTask.cancel(true);
         }
+    }
+
+    private void addCardCorners() {
+        final CardView cardView = (CardView) findViewById(R.id.card);
+        cardView.setRadius(25f);
+    }
+
+    private void removeCardCorners() {
+        final CardView cardView = (CardView)findViewById(R.id.card);
+        ObjectAnimator.ofFloat(cardView, "radius", 0f).setDuration(50).start();
     }
 
     private void loadFullSizeBitmap(int smallResId) {
