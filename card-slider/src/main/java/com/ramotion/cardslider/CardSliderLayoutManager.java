@@ -131,7 +131,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         int delta;
         if (dx < 0) {
-            delta = scrollRight(dx);
+            delta = scrollRight(Math.max(dx, -cardWidth));
         } else {
             delta = scrollLeft(dx);
         }
@@ -329,7 +329,14 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                 view.offsetLeftAndRight(-allowedDelta);
             } else {
                 final int border = activeCardLeft - step * j;
-                final int allowedDelta = getAllowedRightDelta(view, jDelta, border);
+
+                final int allowedDelta;
+                if (border == activeCardLeft && i == cnt - 1) {
+                    allowedDelta = getAllowedRightDelta(view, delta, border);
+                } else {
+                    allowedDelta = getAllowedRightDelta(view, jDelta, border);
+                }
+
                 view.offsetLeftAndRight(-allowedDelta);
                 j++;
             }
