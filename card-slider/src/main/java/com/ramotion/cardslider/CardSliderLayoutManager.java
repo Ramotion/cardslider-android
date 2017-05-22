@@ -224,7 +224,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
 
         View result = null;
-        float lastZ = 0f;
+        float lastValue = cardWidth;
 
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             final View child = getChildAt(i);
@@ -232,9 +232,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                 continue;
             }
 
-            final float z = ViewCompat.getZ(child);
-            if (lastZ < z) {
-                lastZ = z;
+            final int viewLeft = getDecoratedLeft(child);
+            final int diff = activeCardRight - viewLeft;
+            if (diff < lastValue) {
+                lastValue = diff;
                 result = child;
             }
         }
