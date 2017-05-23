@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initCountryText() {
         countryAnimDuration = getResources().getInteger(R.integer.labels_animation_duration);
-        countryOffset1 = getResources().getDimensionPixelSize(R.dimen.active_card_left);
+        countryOffset1 = getResources().getDimensionPixelSize(R.dimen.left_offset);
         countryOffset2 = getResources().getDimensionPixelSize(R.dimen.active_card_width);
         country1TextView = (TextView) findViewById(R.id.tv_country_1);
         country2TextView = (TextView) findViewById(R.id.tv_country_2);

@@ -12,7 +12,7 @@
 
         <FrameLayout
             android:id="@+id/countries"
-            android:layout_width="@dimen/active_card_width"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_alignParentStart="true"
@@ -35,7 +35,7 @@
         </FrameLayout>
 
         <FrameLayout
-            android:layout_width="79dp"
+            android:layout_width="85dp"
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:background="@drawable/temperature_background"
@@ -56,18 +56,19 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="210dp"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="18dp"
+        android:layout_marginStart="@dimen/recycler_view_left_offset"/>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp">
+        android:layout_marginTop="15dp">
 
         <ImageView
             android:layout_width="13dp"
             android:layout_height="13dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="30dp"
             android:src="@drawable/star"
             android:scaleType="fitCenter"/>
 
@@ -76,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/active_card_left"/>
+            android:layout_marginStart="@dimen/left_offset"/>
 
     </FrameLayout>
 
@@ -85,7 +86,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="@dimen/active_card_left"
+        android:layout_marginStart="@dimen/left_offset"
         android:layout_marginEnd="10dp"/>
 
     <FrameLayout
@@ -106,7 +107,7 @@
                 android:layout_width="13dp"
                 android:layout_height="13dp"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="30dp"
                 android:src="@drawable/clock"
                 android:scaleType="fitCenter"/>
 
@@ -115,7 +116,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="@dimen/active_card_left"/>
+                android:layout_marginStart="@dimen/left_offset"/>
 
         </FrameLayout>
 
@@ -126,16 +127,16 @@
             android:layout_height="wrap_content">
 
             <View
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/green_circle"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/green_dot_big"
                 android:alpha="0.5"/>
 
             <View
-                android:layout_width="15dp"
-                android:layout_height="15dp"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
                 android:layout_gravity="center"
-                android:background="@drawable/green_circle"/>
+                android:background="@drawable/green_dot_small"/>
 
         </FrameLayout>
 

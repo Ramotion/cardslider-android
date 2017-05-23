@@ -7,4 +7,7 @@
     <color name="temperature_background">#348af7</color>
     <color name="temperature_text">@android:color/white</color>
 
+    <color name="green_dot_big">#b8ffa4</color>
+    <color name="green_dot_small">#5ac83b</color>
+
 </resources>
