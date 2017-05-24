@@ -18,7 +18,7 @@ import java.util.LinkedList;
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
-    private static final float SCALE_LEFT = 0.7f;
+    private static final float SCALE_LEFT = 0.65f;
     private static final float SCALE_CENTER = 0.95f;
     private static final float SCALE_RIGHT = 0.8f;
     private static final float SCALE_CENTER_TO_LEFT = SCALE_CENTER - SCALE_LEFT;
@@ -41,11 +41,25 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private int scrollRequestedPosition = 0;
 
-    public CardSliderLayoutManager(int activeCardLeft, int cardWidth) {
+    private final float cardsGap;
+    private final int transitionEnd;
+    private final int transitionDistance;
+    private final float transitionRight2Center;
+
+    public CardSliderLayoutManager(int activeCardLeft, int cardWidth, float cardsGap) {
         this.cardWidth = cardWidth;
         this.activeCardLeft = activeCardLeft;
         this.activeCardRight = activeCardLeft + cardWidth;
         this.activeCardCenter = activeCardLeft + ((this.activeCardRight - activeCardLeft) / 2);
+
+        this.transitionEnd = activeCardCenter;
+        this.transitionDistance = activeCardRight - transitionEnd;
+        this.cardsGap = cardsGap;
+
+        final float centerBorder = (cardWidth - cardWidth * SCALE_CENTER) / 2f;
+        final float rightBorder = (cardWidth - cardWidth * SCALE_RIGHT) / 2f;
+        final float right2centerDistance = (activeCardRight + centerBorder) - (activeCardRight - rightBorder);
+        this.transitionRight2Center = right2centerDistance - cardsGap;
     }
 
     @Override
@@ -496,15 +510,19 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             }
 
             viewLeft = getDecoratedRight(view);
-            fillRight = viewLeft < width;
+            fillRight = viewLeft < width + cardWidth;
             pos++;
         }
     }
 
     private void updateViewScale() {
+        View prevView = null;
+
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
+
+            ViewCompat.setAlpha(view, 1);
 
             if (viewLeft < activeCardLeft) {
                 final float ratio = (float) viewLeft / activeCardLeft;
@@ -517,24 +535,41 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                 } else {
                     ViewCompat.setZ(view, Z_LEFT_2);
                 }
+                ViewCompat.setTranslationX(view, 0);
             } else if (viewLeft < activeCardCenter) {
                 ViewCompat.setScaleX(view, SCALE_CENTER);
                 ViewCompat.setScaleY(view, SCALE_CENTER);
                 ViewCompat.setZ(view, Z_CENTER_1);
-                ViewCompat.setAlpha(view, 1);
+                ViewCompat.setTranslationX(view, 0);
             } else if (viewLeft < activeCardRight) {
                 final float ratio = (float) (viewLeft - activeCardCenter) / (activeCardRight - activeCardCenter);
                 final float scale = SCALE_CENTER - SCALE_CENTER_TO_RIGHT * ratio;
                 ViewCompat.setScaleX(view, scale);
                 ViewCompat.setScaleY(view, scale);
+
                 ViewCompat.setZ(view, Z_CENTER_2);
-                ViewCompat.setAlpha(view, 1);
+
+                final float transition = Math.min(transitionRight2Center, transitionRight2Center * (viewLeft - transitionEnd) / transitionDistance);
+                ViewCompat.setTranslationX(view, -transition);
             } else if (viewLeft >= activeCardRight) {
                 ViewCompat.setScaleX(view, SCALE_RIGHT);
                 ViewCompat.setScaleY(view, SCALE_RIGHT);
+
                 ViewCompat.setZ(view, Z_RIGHT);
-                ViewCompat.setAlpha(view, 1);
+
+                if (prevView != null) {
+                    final int prevRight = getDecoratedRight(prevView);
+                    final float prevBorder = (cardWidth - cardWidth * ViewCompat.getScaleX(prevView)) / 2;
+                    final float prevTransition = ViewCompat.getTranslationX(prevView);
+                    final float currentBorder = (cardWidth - cardWidth * ViewCompat.getScaleX(view)) / 2;
+                    final float distance = (viewLeft + currentBorder) - (prevRight - prevBorder + prevTransition);
+
+                    final float transition = distance - cardsGap;
+                    ViewCompat.setTranslationX(view, -transition);
+                }
             }
+
+            prevView = view;
         }
     }
 

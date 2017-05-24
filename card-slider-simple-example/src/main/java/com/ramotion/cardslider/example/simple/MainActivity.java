@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private void initRecyclerView() {
         final int left = getResources().getDimensionPixelSize(R.dimen.active_card_left);
         final int width = getResources().getDimensionPixelSize(R.dimen.active_card_width);
+        final int cardsGap = getResources().getDimensionPixelSize(R.dimen.cards_gap);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(sliderAdapter);
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        layoutManger = new CardSliderLayoutManager(left, width);
+        layoutManger = new CardSliderLayoutManager(left, width, cardsGap);
         recyclerView.setLayoutManager(layoutManger);
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
