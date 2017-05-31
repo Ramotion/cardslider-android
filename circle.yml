@@ -5,7 +5,7 @@ dependencies:
     - curl http://www.jpm4j.org/install/script > jpmInstall.sh
     - sudo sh jpmInstall.sh
     - mkdir $ANDROID_HOME/licenses; ls -l $ANDROID_HOME/licenses
-    - cp --force /Users/andreylos/Library/Android/sdk/licenses/* $ANDROID_HOME/licenses; ls -l $ANDROID_HOME/licenses
+    # - cp --force /Users/andreylos/Library/Android/sdk/licenses/* $ANDROID_HOME/licenses; ls -l $ANDROID_HOME/licenses
 
 machine:
   java:
