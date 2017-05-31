@@ -1,0 +1,13 @@
+dependencies:
+  pre:
+    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,extra-google-google_play_services,extra-google-m2repository,android-25
+    - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2,extra-android-m2repository,android-25
+    - curl http://www.jpm4j.org/install/script > jpmInstall.sh
+    - sudo sh jpmInstall.sh
+    - mkdir $ANDROID_HOME/licenses; ls -l $ANDROID_HOME/licenses
+    - cp --force licenses/* $ANDROID_HOME/licenses; ls -l $ANDROID_HOME/licenses
+
+machine:
+  java:
+    version: oraclejdk8
+
