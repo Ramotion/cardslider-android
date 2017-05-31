@@ -4,7 +4,7 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter build-tools-23.0.3
     - curl http://www.jpm4j.org/install/script > jpmInstall.sh
     - sudo sh jpmInstall.sh
-    - sudo jpm install com.codacy:codacy-coverage-reporter:assembly
+    # - sudo jpm install com.codacy:codacy-coverage-reporter:assembly
 
 machine:
   java:
