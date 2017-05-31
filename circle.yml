@@ -4,7 +4,9 @@ dependencies:
     - echo y | android update sdk --no-ui --all --filter build-tools-25.0.2,extra-android-m2repository,android-25
     - curl http://www.jpm4j.org/install/script > jpmInstall.sh
     - sudo sh jpmInstall.sh
-    # - sudo jpm install com.codacy:codacy-coverage-reporter:assembly
+
+override:
+      - ANDROID_HOME=/usr/local/android-sdk-linux ./gradlew dependencies || true
 
 machine:
   java:
