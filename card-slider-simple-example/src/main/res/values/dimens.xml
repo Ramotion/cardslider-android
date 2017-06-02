@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="active_card_left">50dp</dimen>
+    <dimen name="recycler_view_left_offset">9dp</dimen>
+    <dimen name="left_offset">61dp</dimen>
+    <dimen name="active_card_width">148dp</dimen>
+    <dimen name="cards_gap">12dp</dimen>
+</resources>
