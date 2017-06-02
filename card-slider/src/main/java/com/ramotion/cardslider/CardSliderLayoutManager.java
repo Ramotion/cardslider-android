@@ -1,5 +1,7 @@
 package com.ramotion.cardslider;
 
+import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.PointF;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -17,6 +20,10 @@ import java.util.LinkedList;
 
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
+
+    private static final int DEFAULT_ACTIVE_CARD_LEFT_OFFSET = 50;
+    private static final int DEFAULT_CARD_WIDTH = 148;
+    private static final int DEFAULT_CARDS_GAP = 12;
 
     private static final float SCALE_LEFT = 0.65f;
     private static final float SCALE_CENTER = 0.95f;
@@ -34,19 +41,54 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private final SparseArray<View> viewCache = new SparseArray<>();
     private final SparseIntArray cardsXCoords = new SparseIntArray();
 
-    private final int cardWidth;
-    private final int activeCardLeft;
-    private final int activeCardRight;
-    private final int activeCardCenter;
+    private int cardWidth;
+    private int activeCardLeft;
+    private int activeCardRight;
+    private int activeCardCenter;
+
+    private float cardsGap;
+    private int transitionEnd;
+    private int transitionDistance;
+    private float transitionRight2Center;
 
     private int scrollRequestedPosition = 0;
 
-    private final float cardsGap;
-    private final int transitionEnd;
-    private final int transitionDistance;
-    private final float transitionRight2Center;
+    public CardSliderLayoutManager(@NonNull Context context) {
+        this(context, null);
+    }
+
+    public CardSliderLayoutManager(@NonNull Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public CardSliderLayoutManager(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
+        final float density = context.getResources().getDisplayMetrics().density;
+
+        final int defaultCardWidth = (int) (DEFAULT_CARD_WIDTH * density);
+        final int defaultActiveCardLeft = (int) (DEFAULT_ACTIVE_CARD_LEFT_OFFSET * density);
+        final float defaultCardsGap = DEFAULT_CARDS_GAP * density;
+
+        if (attrs == null) {
+            initialize(defaultActiveCardLeft, defaultCardWidth, defaultCardsGap);
+        } else {
+            TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CardSlider, 0, 0);
+            try {
+                initialize(
+                    a.getDimensionPixelSize(R.styleable.CardSlider_cardWidth, defaultCardWidth),
+                    a.getDimensionPixelSize(R.styleable.CardSlider_activeCardLeftOffset, defaultActiveCardLeft),
+                    a.getDimension(R.styleable.CardSlider_cardsGap, defaultCardsGap)
+                );
+            } finally {
+                a.recycle();
+            }
+        }
+    }
 
     public CardSliderLayoutManager(int activeCardLeft, int cardWidth, float cardsGap) {
+        initialize(activeCardLeft, cardWidth, cardsGap);
+    }
+
+    private void initialize(int activeCardLeft, int cardWidth, float cardsGap) {
         this.cardWidth = cardWidth;
         this.activeCardLeft = activeCardLeft;
         this.activeCardRight = activeCardLeft + cardWidth;

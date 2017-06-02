@@ -65,10 +65,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initRecyclerView() {
-        final int left = getResources().getDimensionPixelSize(R.dimen.active_card_left);
-        final int width = getResources().getDimensionPixelSize(R.dimen.active_card_width);
-        final int cardsGap = getResources().getDimensionPixelSize(R.dimen.cards_gap);
-
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setAdapter(sliderAdapter);
         recyclerView.setHasFixedSize(true);
@@ -82,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        layoutManger = new CardSliderLayoutManager(left, width, cardsGap);
+        layoutManger = new CardSliderLayoutManager(this);
         recyclerView.setLayoutManager(layoutManger);
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
@@ -117,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
     private void initCountryText() {
         countryAnimDuration = getResources().getInteger(R.integer.labels_animation_duration);
         countryOffset1 = getResources().getDimensionPixelSize(R.dimen.left_offset);
-        countryOffset2 = getResources().getDimensionPixelSize(R.dimen.active_card_width);
+        countryOffset2 = getResources().getDimensionPixelSize(R.dimen.card_width);
         country1TextView = (TextView) findViewById(R.id.tv_country_1);
         country2TextView = (TextView) findViewById(R.id.tv_country_2);
 

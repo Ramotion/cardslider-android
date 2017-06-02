@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CardSlider">
+        <attr name="activeCardLeftOffset" format="dimension"/>
+        <attr name="cardWidth" format="dimension"/>
+        <attr name="cardsGap" format="dimension"/>
+    </declare-styleable>
+</resources>
