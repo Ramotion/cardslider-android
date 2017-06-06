@@ -18,6 +18,9 @@ import android.view.View;
 
 import java.util.LinkedList;
 
+/**
+ * A {@link android.support.v7.widget.RecyclerView.LayoutManager} implementation.
+ */
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
@@ -53,15 +56,24 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private int scrollRequestedPosition = 0;
 
+    /**
+     * Creates CardSliderLayoutManager with default values
+     *
+     * @param context   Current context, will be used to access resources.
+     */
     public CardSliderLayoutManager(@NonNull Context context) {
-        this(context, null);
+        this(context, null, 0, 0);
     }
 
-    public CardSliderLayoutManager(@NonNull Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public CardSliderLayoutManager(@NonNull Context context, AttributeSet attrs, int defStyleAttr) {
+    /**
+     * Constructor used when layout manager is set in XML by RecyclerView attribute
+     * "layoutManager".
+     *
+     * @attr ref R.styleable#CardSlider_activeCardLeftOffset
+     * @attr ref R.styleable#CardSlider_cardWidth
+     * @attr ref R.styleable#CardSlider_cardsGap
+     */
+    public CardSliderLayoutManager(@NonNull Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         final float density = context.getResources().getDisplayMetrics().density;
 
         final int defaultCardWidth = (int) (DEFAULT_CARD_WIDTH * density);
@@ -84,6 +96,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
+    /**
+     * Creates CardSliderLayoutManager with specified values in pixels.
+     *
+     * @param activeCardLeft    Active card offset from start of RecyclerView. Default value is 50dp.
+     * @param cardWidth         Card width. Default value is 148dp.
+     * @param cardsGap          Distance between cards. Default value is 12dp.
+     */
     public CardSliderLayoutManager(int activeCardLeft, int cardWidth, float cardsGap) {
         initialize(activeCardLeft, cardWidth, cardsGap);
     }
@@ -243,6 +262,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
+    /**
+     * @return active card position or RecyclerView.NO_POSITION
+     */
     public int getActiveCardPosition() {
         int result = RecyclerView.NO_POSITION;
 
