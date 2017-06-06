@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.StyleRes;
@@ -121,6 +122,9 @@ public class MainActivity extends AppCompatActivity {
         country2TextView.setX(countryOffset2);
         country1TextView.setText(countries[0]);
         country2TextView.setAlpha(0f);
+
+        country1TextView.setTypeface(Typeface.createFromAsset(getAssets(), "open-sans-extrabold.ttf"));
+        country2TextView.setTypeface(Typeface.createFromAsset(getAssets(), "open-sans-extrabold.ttf"));
     }
 
     private void initGreenDot() {
@@ -130,11 +134,12 @@ public class MainActivity extends AppCompatActivity {
                 mapSwitcher.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 
                 final int viewLeft = mapSwitcher.getLeft();
-                final int viewTop = mapSwitcher.getTop();
+                final int viewTop = mapSwitcher.getTop() + mapSwitcher.getHeight() / 3;
 
                 final int border = 100;
                 final int xRange = mapSwitcher.getWidth() - border * 2;
-                final int yRange = mapSwitcher.getHeight() - border * 2;
+                final int yRange = (mapSwitcher.getHeight() / 3) * 2 - border * 2;
+
                 final Random rnd = new Random();
 
                 for (int i = 0, cnt = dotCoords.length; i < cnt; i++) {

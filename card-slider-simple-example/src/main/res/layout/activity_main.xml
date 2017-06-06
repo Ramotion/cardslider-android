@@ -22,14 +22,16 @@
                 android:id="@+id/tv_country_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:textSize="28sp"
-                android:layout_gravity="center_vertical"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_country_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="28sp"
+                android:textStyle="bold"
                 android:layout_gravity="center_vertical"/>
 
         </FrameLayout>
@@ -81,27 +83,29 @@
 
     </FrameLayout>
 
-    <TextSwitcher
-        android:id="@+id/ts_description"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
+    <RelativeLayout
         android:layout_marginTop="10dp"
-        android:layout_marginStart="@dimen/left_offset"
-        android:layout_marginEnd="10dp"/>
-
-    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
 
         <ImageSwitcher
             android:id="@+id/ts_map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <TextSwitcher
+            android:id="@+id/ts_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/left_offset"
+            android:layout_marginEnd="10dp"/>
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/ts_description">
 
             <ImageView
                 android:layout_width="13dp"
@@ -119,7 +123,6 @@
                 android:layout_marginStart="@dimen/left_offset"/>
 
         </FrameLayout>
-
 
         <FrameLayout
             android:id="@+id/green_dot"
@@ -140,6 +143,6 @@
 
         </FrameLayout>
 
-    </FrameLayout>
+    </RelativeLayout>
 
 </LinearLayout>
