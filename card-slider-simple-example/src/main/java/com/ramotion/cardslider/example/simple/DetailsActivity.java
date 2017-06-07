@@ -39,7 +39,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
-        if (Build.VERSION.SDK_INT < 21) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             loadFullSizeBitmap(smallResId);
         } else {
             getWindow().getSharedElementEnterTransition().addListener(new Transition.TransitionListener() {

@@ -293,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 final Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
                 intent.putExtra(DetailsActivity.BUNDLE_IMAGE_ID, pics[activeCardPosition % pics.length]);
 
-                if (Build.VERSION.SDK_INT < 21) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     startActivity(intent);
                 } else {
                     final ActivityOptions options = ActivityOptions
