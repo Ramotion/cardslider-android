@@ -25,11 +25,6 @@ class BackgroundBitmapCache {
 
         mBackgroundsCache = new LruCache<Integer, Bitmap>(cacheSize) {
             @Override
-            protected void entryRemoved(boolean evicted, Integer key, Bitmap oldValue, Bitmap newValue) {
-                super.entryRemoved(evicted, key, oldValue, newValue);
-            }
-
-            @Override
             protected int sizeOf(Integer key, Bitmap bitmap) {
                 // The cache size will be measured in kilobytes rather than number of items.
                 return bitmap.getByteCount() / 1024;
