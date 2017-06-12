@@ -408,15 +408,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
                 view.offsetLeftAndRight(-allowedDelta);
             } else {
                 final int border = activeCardLeft - step * j;
-
-                final int allowedDelta;
-                if (border == activeCardLeft && i == cnt - 1) {
-                    allowedDelta = getAllowedRightDelta(view, delta, border);
-                } else {
-                    allowedDelta = getAllowedRightDelta(view, jDelta, border);
-                }
-
-                view.offsetLeftAndRight(-allowedDelta);
+                view.offsetLeftAndRight(-getAllowedRightDelta(view, jDelta, border));
                 j++;
             }
 
