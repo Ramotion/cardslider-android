@@ -16,6 +16,8 @@ import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.View;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 /**
@@ -27,19 +29,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private static final int DEFAULT_ACTIVE_CARD_LEFT_OFFSET = 50;
     private static final int DEFAULT_CARD_WIDTH = 148;
     private static final int DEFAULT_CARDS_GAP = 12;
-
-    private static final float SCALE_LEFT = 0.65f;
-    private static final float SCALE_CENTER = 0.95f;
-    private static final float SCALE_RIGHT = 0.8f;
-    private static final float SCALE_CENTER_TO_LEFT = SCALE_CENTER - SCALE_LEFT;
-    private static final float SCALE_CENTER_TO_RIGHT = SCALE_CENTER - SCALE_RIGHT;
     private static final int LEFT_CARD_COUNT = 2;
-
-    private static final int Z_LEFT_1 = 4;
-    private static final int Z_LEFT_2 = 6;
-    private static final int Z_CENTER_1 = 12;
-    private static final int Z_CENTER_2 = 16;
-    private static final int Z_RIGHT = 8;
 
     private final SparseArray<View> viewCache = new SparseArray<>();
     private final SparseIntArray cardsXCoords = new SparseIntArray();
@@ -50,11 +40,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private int activeCardCenter;
 
     private float cardsGap;
-    private int transitionEnd;
-    private int transitionDistance;
-    private float transitionRight2Center;
 
     private int scrollRequestedPosition = 0;
+
+    private ViewUpdater viewUpdater;
 
     /**
      * Creates CardSliderLayoutManager with default values
@@ -81,18 +70,25 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         final float defaultCardsGap = DEFAULT_CARDS_GAP * density;
 
         if (attrs == null) {
-            initialize(defaultActiveCardLeft, defaultCardWidth, defaultCardsGap);
+            initialize(defaultActiveCardLeft, defaultCardWidth, defaultCardsGap, null);
         } else {
-            TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CardSlider, 0, 0);
+            int attrCardWidth;
+            int attrActiveCardLeft;
+            float attrCardsGap;
+            String viewUpdateClassName;
+
+            final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.CardSlider, 0, 0);
             try {
-                initialize(
-                    a.getDimensionPixelSize(R.styleable.CardSlider_cardWidth, defaultCardWidth),
-                    a.getDimensionPixelSize(R.styleable.CardSlider_activeCardLeftOffset, defaultActiveCardLeft),
-                    a.getDimension(R.styleable.CardSlider_cardsGap, defaultCardsGap)
-                );
+                attrCardWidth = a.getDimensionPixelSize(R.styleable.CardSlider_cardWidth, defaultCardWidth);
+                attrActiveCardLeft = a.getDimensionPixelSize(R.styleable.CardSlider_activeCardLeftOffset, defaultActiveCardLeft);
+                attrCardsGap = a.getDimension(R.styleable.CardSlider_cardsGap, defaultCardsGap);
+                viewUpdateClassName = a.getString(R.styleable.CardSlider_viewUpdater);
             } finally {
                 a.recycle();
             }
+
+            final ViewUpdater viewUpdater = loadViewUpdater(context, viewUpdateClassName, attrs);
+            initialize(attrActiveCardLeft, attrCardWidth, attrCardsGap, viewUpdater);
         }
     }
 
@@ -104,23 +100,21 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
      * @param cardsGap          Distance between cards. Default value is 12dp.
      */
     public CardSliderLayoutManager(int activeCardLeft, int cardWidth, float cardsGap) {
-        initialize(activeCardLeft, cardWidth, cardsGap);
+        initialize(activeCardLeft, cardWidth, cardsGap, null);
     }
 
-    private void initialize(int activeCardLeft, int cardWidth, float cardsGap) {
-        this.cardWidth = cardWidth;
-        this.activeCardLeft = activeCardLeft;
+    private void initialize(int left, int width, float gap, @Nullable ViewUpdater updater) {
+        this.cardWidth = width;
+        this.activeCardLeft = left;
         this.activeCardRight = activeCardLeft + cardWidth;
         this.activeCardCenter = activeCardLeft + ((this.activeCardRight - activeCardLeft) / 2);
+        this.cardsGap = gap;
 
-        this.transitionEnd = activeCardCenter;
-        this.transitionDistance = activeCardRight - transitionEnd;
-        this.cardsGap = cardsGap;
-
-        final float centerBorder = (cardWidth - cardWidth * SCALE_CENTER) / 2f;
-        final float rightBorder = (cardWidth - cardWidth * SCALE_RIGHT) / 2f;
-        final float right2centerDistance = (activeCardRight + centerBorder) - (activeCardRight - rightBorder);
-        this.transitionRight2Center = right2centerDistance - cardsGap;
+        this.viewUpdater = updater;
+        if (this.viewUpdater == null) {
+            this.viewUpdater = new DefaultViewUpdater(this);
+        }
+        viewUpdater.onLayoutManagerInitialized();
     }
 
     @Override
@@ -266,70 +260,39 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
      * @return active card position or RecyclerView.NO_POSITION
      */
     public int getActiveCardPosition() {
-        int result = RecyclerView.NO_POSITION;
-
         if (scrollRequestedPosition != RecyclerView.NO_POSITION) {
-            result = scrollRequestedPosition;
+            return scrollRequestedPosition;
         } else {
-            View biggestView = null;
-            float lastScaleX = 0f;
-
-            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-                final View child = getChildAt(i);
-                if (getDecoratedLeft(child) >= activeCardRight) {
-                    continue;
-                }
-
-                final float scaleX = ViewCompat.getScaleX(child);
-                if (lastScaleX < scaleX) {
-                    lastScaleX = scaleX;
-                    biggestView = child;
-                }
-            }
-
-            if (biggestView != null) {
-                result = getPosition(biggestView);
-            }
+            return viewUpdater.getActiveCardPosition();
         }
-
-        return result;
     }
 
     @Nullable
-    View getTopView() {
-        if (getChildCount() == 0) {
-            return null;
-        }
-
-        View result = null;
-        float lastValue = cardWidth;
-
-        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-            final View child = getChildAt(i);
-            if (getDecoratedLeft(child) >= activeCardRight) {
-                continue;
-            }
-
-            final int viewLeft = getDecoratedLeft(child);
-            final int diff = activeCardRight - viewLeft;
-            if (diff < lastValue) {
-                lastValue = diff;
-                result = child;
-            }
-        }
-
-        return result;
+    public View getTopView() {
+        return viewUpdater.getTopView();
     }
 
-    int getActiveCardLeft() {
+    public int getActiveCardLeft() {
         return activeCardLeft;
     }
 
-    int getCardWidth() {
+    public int getActiveCardRight() {
+        return activeCardRight;
+    }
+
+    public int getActiveCardCenter() {
+        return activeCardCenter;
+    }
+
+    public int getCardWidth() {
         return cardWidth;
     }
 
-    LinearSmoothScroller getSmoothScroller(final RecyclerView recyclerView) {
+    public float getCardsGap() {
+        return cardsGap;
+    }
+
+    public LinearSmoothScroller getSmoothScroller(final RecyclerView recyclerView) {
         return new LinearSmoothScroller(recyclerView.getContext()) {
             @Override
             public int calculateDxToMakeVisible(View view, int snapPreference) {
@@ -361,6 +324,51 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             }
 
         };
+    }
+
+    private ViewUpdater loadViewUpdater(Context context, String className, AttributeSet attrs) {
+        if (className == null || className.trim().length() == 0) {
+            return null;
+        }
+
+        final String fullClassName;
+        if (className.charAt(0) == '.') {
+            fullClassName = context.getPackageName() + className;
+        } else if (className.contains(".")) {
+            fullClassName = className;
+        } else {
+            fullClassName = CardSliderLayoutManager.class.getPackage().getName() + '.' + className;
+        }
+
+        ViewUpdater updater = null;
+        try {
+            final ClassLoader classLoader = context.getClassLoader();
+
+            final Class<? extends ViewUpdater> viewUpdaterClass =
+                    classLoader.loadClass(fullClassName).asSubclass(ViewUpdater.class);
+            final Constructor<? extends ViewUpdater> constructor =
+                    viewUpdaterClass.getConstructor(CardSliderLayoutManager.class);
+
+            constructor.setAccessible(true);
+            updater = constructor.newInstance(this);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalStateException(attrs.getPositionDescription() +
+                    ": Error creating LayoutManager " + className, e);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(attrs.getPositionDescription()
+                    + ": Unable to find ViewUpdater" + className, e);
+        } catch (InvocationTargetException | InstantiationException e) {
+            throw new IllegalStateException(attrs.getPositionDescription()
+                    + ": Could not instantiate the ViewUpdater: " + className, e);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(attrs.getPositionDescription()
+                    + ": Cannot access non-public constructor " + className, e);
+        } catch (ClassCastException e) {
+            throw new IllegalStateException(attrs.getPositionDescription()
+                    + ": Class is not a ViewUpdater " + className, e);
+        }
+
+        return updater;
     }
 
     private int scrollRight(int dx) {
@@ -572,61 +580,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     private void updateViewScale() {
-        View prevView = null;
-
-        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
-            final View view = getChildAt(i);
-            final int viewLeft = getDecoratedLeft(view);
-
-            ViewCompat.setAlpha(view, 1);
-
-            if (viewLeft < activeCardLeft) {
-                final float ratio = (float) viewLeft / activeCardLeft;
-                final float scale = SCALE_LEFT + SCALE_CENTER_TO_LEFT * ratio;
-                ViewCompat.setScaleX(view, scale);
-                ViewCompat.setScaleY(view, scale);
-                ViewCompat.setAlpha(view, 0.1f + ratio);
-                if (viewLeft < activeCardLeft / 2) {
-                    ViewCompat.setZ(view, Z_LEFT_1);
-                } else {
-                    ViewCompat.setZ(view, Z_LEFT_2);
-                }
-                ViewCompat.setTranslationX(view, 0);
-            } else if (viewLeft < activeCardCenter) {
-                ViewCompat.setScaleX(view, SCALE_CENTER);
-                ViewCompat.setScaleY(view, SCALE_CENTER);
-                ViewCompat.setZ(view, Z_CENTER_1);
-                ViewCompat.setTranslationX(view, 0);
-            } else if (viewLeft < activeCardRight) {
-                final float ratio = (float) (viewLeft - activeCardCenter) / (activeCardRight - activeCardCenter);
-                final float scale = SCALE_CENTER - SCALE_CENTER_TO_RIGHT * ratio;
-                ViewCompat.setScaleX(view, scale);
-                ViewCompat.setScaleY(view, scale);
-
-                ViewCompat.setZ(view, Z_CENTER_2);
-
-                final float transition = Math.min(transitionRight2Center, transitionRight2Center * (viewLeft - transitionEnd) / transitionDistance);
-                ViewCompat.setTranslationX(view, -transition);
-            } else if (viewLeft >= activeCardRight) {
-                ViewCompat.setScaleX(view, SCALE_RIGHT);
-                ViewCompat.setScaleY(view, SCALE_RIGHT);
-
-                ViewCompat.setZ(view, Z_RIGHT);
-
-                if (prevView != null) {
-                    final int prevRight = getDecoratedRight(prevView);
-                    final float prevBorder = (cardWidth - cardWidth * ViewCompat.getScaleX(prevView)) / 2;
-                    final float prevTransition = ViewCompat.getTranslationX(prevView);
-                    final float currentBorder = (cardWidth - cardWidth * ViewCompat.getScaleX(view)) / 2;
-                    final float distance = (viewLeft + currentBorder) - (prevRight - prevBorder + prevTransition);
-
-                    final float transition = distance - cardsGap;
-                    ViewCompat.setTranslationX(view, -transition);
-                }
-            }
-
-            prevView = view;
-        }
+        viewUpdater.updateView();
     }
 
     private static class SavedState implements Parcelable {
