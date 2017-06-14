@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
@@ -295,8 +296,10 @@ public class MainActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     startActivity(intent);
                 } else {
+                    final CardView cardView = (CardView) view;
+                    final View sharedView = cardView.getChildAt(cardView.getChildCount() - 1);
                     final ActivityOptions options = ActivityOptions
-                            .makeSceneTransitionAnimation(MainActivity.this, view, "shared");
+                            .makeSceneTransitionAnimation(MainActivity.this, sharedView, "shared");
                     startActivity(intent, options.toBundle());
                 }
             } else if (clickedPosition > activeCardPosition) {
