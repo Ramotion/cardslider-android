@@ -79,8 +79,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        layoutManger = new CardSliderLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManger);
+        layoutManger = (CardSliderLayoutManager) recyclerView.getLayoutManager();
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
     }
