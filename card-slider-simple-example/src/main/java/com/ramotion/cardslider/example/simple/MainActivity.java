@@ -4,9 +4,12 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     private long countryAnimDuration;
     private int currentPosition;
 
+    private DecodeBitmapTask decodeMapBitmapTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +88,14 @@ public class MainActivity extends AppCompatActivity {
         layoutManger = (CardSliderLayoutManager) recyclerView.getLayoutManager();
 
         new CardSnapHelper().attachToRecyclerView(recyclerView);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (decodeMapBitmapTask != null) {
+            decodeMapBitmapTask.cancel(true);
+        }
     }
 
     private void initSwitchers() {
@@ -225,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
 
         descriptionsSwitcher.setText(getString(descriptions[pos % descriptions.length]));
 
-        mapSwitcher.setImageResource(maps[pos % maps.length]);
+        showMap(maps[pos % maps.length]);
 
         ViewCompat.animate(greenDot)
                 .translationX(dotCoords[pos % dotCoords.length][0])
@@ -233,6 +246,23 @@ public class MainActivity extends AppCompatActivity {
                 .start();
 
         currentPosition = pos;
+    }
+
+    private void showMap(@DrawableRes int resId) {
+        if (decodeMapBitmapTask != null) {
+            decodeMapBitmapTask.cancel(true);
+        }
+
+        decodeMapBitmapTask = new DecodeBitmapTask(getResources(), resId, mapSwitcher.getWidth(), mapSwitcher.getHeight()) {
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                super.onPostExecute(bitmap);
+                ((ImageView)mapSwitcher.getNextView()).setImageBitmap(bitmap);
+                mapSwitcher.showNext();
+            }
+        };
+
+        decodeMapBitmapTask.execute();
     }
 
     private class TextViewFactory implements  ViewSwitcher.ViewFactory {
