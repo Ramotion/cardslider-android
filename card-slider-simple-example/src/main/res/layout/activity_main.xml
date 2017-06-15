@@ -62,6 +62,7 @@
         android:layout_marginTop="18dp"
         android:layout_marginStart="@dimen/recycler_view_left_offset"
         android:clipChildren="false"
+        android:overScrollMode="never"
         app:layoutManager="com.ramotion.cardslider.CardSliderLayoutManager"
         app:viewUpdater="com.ramotion.cardslider.example.simple.CardsUpdater"/>
 
