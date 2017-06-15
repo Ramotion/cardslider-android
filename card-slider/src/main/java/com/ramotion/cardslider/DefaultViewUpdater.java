@@ -139,10 +139,23 @@ public class DefaultViewUpdater extends ViewUpdater {
                 z = Z_RIGHT;
 
                 if (prevView != null) {
-                    final int prevRight = lm.getDecoratedRight(prevView);
-                    final float prevBorder = (cardWidth - cardWidth * ViewCompat.getScaleX(prevView)) / 2;
-                    final float prevTransition = ViewCompat.getTranslationX(prevView);
-                    final float currentBorder = (cardWidth - cardWidth * ViewCompat.getScaleX(view)) / 2;
+                    final float prevViewScale;
+                    final float prevTransition;
+                    final int prevRight;
+
+                    final boolean isFirstRight = lm.getDecoratedRight(prevView) <= activeCardRight;
+                    if (isFirstRight) {
+                        prevViewScale = SCALE_CENTER;
+                        prevRight = activeCardRight;
+                        prevTransition = 0;
+                    } else {
+                        prevViewScale = ViewCompat.getScaleX(prevView);
+                        prevRight = lm.getDecoratedRight(prevView);
+                        prevTransition = ViewCompat.getTranslationX(prevView);
+                    }
+
+                    final float prevBorder = (cardWidth - cardWidth * prevViewScale) / 2;
+                    final float currentBorder = (cardWidth - cardWidth * SCALE_RIGHT) / 2;
                     final float distance = (viewLeft + currentBorder) - (prevRight - prevBorder + prevTransition);
 
                     final float transition = distance - cardsGap;

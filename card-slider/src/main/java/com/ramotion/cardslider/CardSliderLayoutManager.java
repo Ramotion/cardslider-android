@@ -398,7 +398,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         for (View view: rightViews) {
             final int border = activeCardLeft + getPosition(view) * cardWidth;
-            final int allowedDelta = getAllowedRightDelta(view, delta, border);
+            final int allowedDelta = getAllowedRightDelta(view, dx, border);
             view.offsetLeftAndRight(-allowedDelta);
         }
 
@@ -410,9 +410,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         for (int i = 0, cnt = leftViews.size(); i < cnt; i++) {
             final View view = leftViews.get(i);
-            if (prevView == null || getDecoratedLeft(prevView) > activeCardRight) {
+            if (prevView == null || getDecoratedLeft(prevView) >= activeCardRight) {
                 final int border = activeCardLeft + getPosition(view) * cardWidth;
-                final int allowedDelta = getAllowedRightDelta(view, delta, border);
+                final int allowedDelta = getAllowedRightDelta(view, dx, border);
                 view.offsetLeftAndRight(-allowedDelta);
             } else {
                 final int border = activeCardLeft - step * j;

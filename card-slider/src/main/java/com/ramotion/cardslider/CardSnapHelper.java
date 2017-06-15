@@ -120,7 +120,7 @@ public class CardSnapHelper extends LinearSnapHelper {
                 out[0] = viewLeft - activeCardLeft;
             }
         } else {
-            out[0] = viewLeft - activeCardRight;
+            out[0] = viewLeft - activeCardRight + 1;
         }
 
         if (out[0] != 0) {
