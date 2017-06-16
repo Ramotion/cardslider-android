@@ -526,8 +526,8 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
 
         final int layoutStep = activeCardLeft / LEFT_CARD_COUNT;
-        int pos = Math.max(0, anchorPos - LEFT_CARD_COUNT);
-        int viewLeft = Math.max(0, LEFT_CARD_COUNT - (anchorPos - pos)) * layoutStep;
+        int pos = Math.max(0, anchorPos - LEFT_CARD_COUNT - 1);
+        int viewLeft = Math.max(-1, LEFT_CARD_COUNT - (anchorPos - pos)) * layoutStep;
 
         while (pos < anchorPos) {
             View view = viewCache.get(pos);
