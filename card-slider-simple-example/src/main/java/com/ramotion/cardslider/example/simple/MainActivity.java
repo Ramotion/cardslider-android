@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private final int[] pics = {R.drawable.p1, R.drawable.p2, R.drawable.p3, R.drawable.p4, R.drawable.p5};
     private final int[] maps = {R.drawable.map_1, R.drawable.map_2, R.drawable.map_3};
     private final int[] descriptions = {R.string.text1, R.string.text2, R.string.text3, R.string.text4, R.string.text5};
-    private final String[] countries = {"FRANCE", "KOREA", "ENGLAND", "CHINA", "GREECE"};
+    private final String[] countries = {"PARIS", "SEOUL", "LONDON", "BEIJING", "THIRA"};
     private final String[] places = {"The Louvre", "Gwanghwamun", "Tower Bridge", "Temple of Heaven", "Aegeana Sea"};
     private final String[] temperatures = {"8~21°C", "6~19°C", "5~17°C"};
     private final String[] times = {"4.11~11.15    7:00~18:00", "3.15~9.15    8:00~16:00", "8.1~12.15    7:00~18:00"};
@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public View makeView() {
             final ImageView imageView = new ImageView(MainActivity.this);
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             return imageView;
         }
     }
