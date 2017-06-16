@@ -65,6 +65,7 @@ public class CardsUpdater extends DefaultViewUpdater {
 
             final float scale;
             final float alpha;
+            final float imageAlpha;
             final float z;
             final float x;
 
@@ -72,22 +73,26 @@ public class CardsUpdater extends DefaultViewUpdater {
                 final float ratio = (float) viewLeft / activeCardLeft;
                 scale = SCALE_LEFT + SCALE_CENTER_TO_LEFT * ratio;
                 alpha = 0.8f - ratio;
+                imageAlpha = 0.4f + ratio;
                 z = Z_CENTER_1 * ratio;
                 x = 0;
             } else if (viewLeft < activeCardCenter) {
                 scale = SCALE_CENTER;
                 alpha = 0;
+                imageAlpha = 1;
                 z = Z_CENTER_1;
                 x = 0;
             } else if (viewLeft < activeCardRight) {
                 final float ratio = (float) (viewLeft - activeCardCenter) / (activeCardRight - activeCardCenter);
                 scale = SCALE_CENTER - SCALE_CENTER_TO_RIGHT * ratio;
                 alpha = 0;
+                imageAlpha = 1;
                 z = Z_CENTER_2;
                 x = -Math.min(transitionRight2Center, transitionRight2Center * (viewLeft - transitionEnd) / transitionDistance);
             } else {
                 scale = SCALE_RIGHT;
                 alpha = 0;
+                imageAlpha = 1;
                 z = Z_RIGHT;
 
                 if (prevView != null) {
@@ -123,8 +128,11 @@ public class CardsUpdater extends DefaultViewUpdater {
             ViewCompat.setTranslationX(view, x);
 
             final CardView card = ((CardView)view);
-            final View alphaView = card.getChildAt(card.getChildCount() - 1);
+            final View alphaView = card.getChildAt(1);
+            final View imageView = card.getChildAt(0);
+
             ViewCompat.setAlpha(alphaView, alpha);
+            ViewCompat.setAlpha(imageView, imageAlpha);
 
             prevView = view;
         }
