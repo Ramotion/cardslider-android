@@ -7,7 +7,7 @@
         <attr name="cardWidth" format="dimension"/>
         <!-- Distance between cards. Default value is 12dp. -->
         <attr name="cardsGap" format="dimension"/>
-        <!-- ViewUpdater class -->
+        <!-- ViewUpdater implementation class. If not set, DefaultViewUpdater class is used. -->
         <attr name="viewUpdater" format="string"/>
     </declare-styleable>
 </resources>

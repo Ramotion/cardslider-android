@@ -6,6 +6,9 @@ import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+/**
+ * Default implementation of {@link ViewUpdater}
+ */
 public class DefaultViewUpdater extends ViewUpdater {
 
     private static final float SCALE_LEFT = 0.65f;
@@ -166,14 +169,30 @@ public class DefaultViewUpdater extends ViewUpdater {
                 }
             }
 
-            ViewCompat.setScaleX(view, scale);
-            ViewCompat.setScaleY(view, scale);
-            ViewCompat.setAlpha(view, alpha);
-            ViewCompat.setZ(view, z);
-            ViewCompat.setTranslationX(view, x);
+            onUpdateViewScale(view, scale);
+            onUpdateViewTransitionX(view, x);
+            onUpdateViewZ(view, z);
+            onUpdateViewAlpha(view, alpha);
 
             prevView = view;
         }
+    }
+
+    protected void onUpdateViewAlpha(@NonNull View view, float alpha) {
+        ViewCompat.setAlpha(view, alpha);
+    }
+
+    protected void onUpdateViewScale(@NonNull View view, float scale) {
+        ViewCompat.setScaleX(view, scale);
+        ViewCompat.setScaleY(view, scale);
+    }
+
+    protected void onUpdateViewZ(@NonNull View view, float z) {
+        ViewCompat.setZ(view, z);
+    }
+
+    protected void onUpdateViewTransitionX(@NonNull View view, float x) {
+        ViewCompat.setTranslationX(view, x);
     }
 
 }
