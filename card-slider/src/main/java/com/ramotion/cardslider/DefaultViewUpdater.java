@@ -58,12 +58,13 @@ public class DefaultViewUpdater extends ViewUpdater {
 
         for (int i = 0, cnt = lm.getChildCount(); i < cnt; i++) {
             final View child = lm.getChildAt(i);
-            if (lm.getDecoratedLeft(child) >= activeCardRight) {
+            final int viewLeft = lm.getDecoratedLeft(child);
+            if (viewLeft >= activeCardRight) {
                 continue;
             }
 
             final float scaleX = ViewCompat.getScaleX(child);
-            if (lastScaleX < scaleX) {
+            if (lastScaleX < scaleX && viewLeft < activeCardCenter) {
                 lastScaleX = scaleX;
                 biggestView = child;
             }
