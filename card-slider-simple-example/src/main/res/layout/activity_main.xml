@@ -99,6 +99,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+        <View
+            android:id="@+id/gradient_top"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:background="@android:color/white"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:background="@drawable/gradient_map"
+            android:layout_below="@+id/gradient_top"/>
+
         <TextSwitcher
             android:id="@+id/ts_description"
             android:layout_width="match_parent"

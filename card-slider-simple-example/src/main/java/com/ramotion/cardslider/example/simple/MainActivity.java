@@ -9,7 +9,6 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.IdRes;
 import android.support.annotation.StyleRes;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +16,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
@@ -33,12 +33,12 @@ public class MainActivity extends AppCompatActivity {
 
     private final int[][] dotCoords = new int[5][2];
     private final int[] pics = {R.drawable.p1, R.drawable.p2, R.drawable.p3, R.drawable.p4, R.drawable.p5};
-    private final int[] maps = {R.drawable.map_1, R.drawable.map_2, R.drawable.map_3};
+    private final int[] maps = {R.drawable.map_paris, R.drawable.map_seoul, R.drawable.map_london, R.drawable.map_beijing, R.drawable.map_greece};
     private final int[] descriptions = {R.string.text1, R.string.text2, R.string.text3, R.string.text4, R.string.text5};
     private final String[] countries = {"PARIS", "SEOUL", "LONDON", "BEIJING", "THIRA"};
     private final String[] places = {"The Louvre", "Gwanghwamun", "Tower Bridge", "Temple of Heaven", "Aegeana Sea"};
-    private final String[] temperatures = {"8~21°C", "6~19°C", "5~17°C"};
-    private final String[] times = {"4.11~11.15    7:00~18:00", "3.15~9.15    8:00~16:00", "8.1~12.15    7:00~18:00"};
+    private final String[] temperatures = {"21°C", "19°C", "17°C", "23°C", "20°C"};
+    private final String[] times = {"Aug 1 - Dec 15    7:00-18:00", "Sep 5 - Nov 10    8:00-16:00", "Mar 8 - May 21    7:00-18:00"};
 
     private final SliderAdapter sliderAdapter = new SliderAdapter(pics, 20, new OnCardClickListener());
 
@@ -118,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
         descriptionsSwitcher.setCurrentText(getString(descriptions[0]));
 
         mapSwitcher = (ImageSwitcher) findViewById(R.id.ts_map);
-        mapSwitcher.setInAnimation(this, android.R.anim.fade_in);
-        mapSwitcher.setOutAnimation(this, android.R.anim.fade_out);
+        mapSwitcher.setInAnimation(this, R.anim.fade_in);
+        mapSwitcher.setOutAnimation(this, R.anim.fade_out);
         mapSwitcher.setFactory(new ImageViewFactory());
         mapSwitcher.setImageResource(maps[0]);
     }
@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
                 textView.setGravity(Gravity.CENTER);
             }
 
-            if (Build.VERSION.SDK_INT < 23) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 textView.setTextAppearance(MainActivity.this, styleId);
             } else {
                 textView.setTextAppearance(styleId);
@@ -300,6 +300,10 @@ public class MainActivity extends AppCompatActivity {
         public View makeView() {
             final ImageView imageView = new ImageView(MainActivity.this);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            final LayoutParams lp = new ImageSwitcher.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+            imageView.setLayoutParams(lp);
+
             return imageView;
         }
     }
