@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple;
+package com.ramotion.cardslider.example.simple.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -13,8 +13,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 
+import com.ramotion.cardslider.example.simple.R;
 
-class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
+
+public class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
 
     private final BackgroundBitmapCache cache;
     private final Resources resources;
@@ -22,7 +24,7 @@ class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
     private final int reqWidth;
     private final int reqHeight;
 
-    DecodeBitmapTask(Resources resources, @DrawableRes int bitmapResId, int reqWidth, int reqHeight) {
+    public DecodeBitmapTask(Resources resources, @DrawableRes int bitmapResId, int reqWidth, int reqHeight) {
         this.cache = BackgroundBitmapCache.getInstance();
         this.resources = resources;
         this.bitmapResId = bitmapResId;

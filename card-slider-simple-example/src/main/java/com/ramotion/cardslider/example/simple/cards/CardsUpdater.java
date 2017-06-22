@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple;
+package com.ramotion.cardslider.example.simple.cards;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

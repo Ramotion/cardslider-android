@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple;
+package com.ramotion.cardslider.example.simple.cards;
 
 
 import android.support.v7.widget.RecyclerView;
@@ -6,13 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
+import com.ramotion.cardslider.example.simple.R;
+
+public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
     private final int count;
     private final int[] content;
     private final View.OnClickListener listener;
 
-    SliderAdapter(int[] content, int count, View.OnClickListener listener) {
+    public SliderAdapter(int[] content, int count, View.OnClickListener listener) {
         this.content = content;
         this.count = count;
         this.listener = listener;

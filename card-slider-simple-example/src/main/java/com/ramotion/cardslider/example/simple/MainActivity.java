@@ -26,6 +26,8 @@ import android.widget.ViewSwitcher;
 
 import com.ramotion.cardslider.CardSliderLayoutManager;
 import com.ramotion.cardslider.CardSnapHelper;
+import com.ramotion.cardslider.example.simple.cards.SliderAdapter;
+import com.ramotion.cardslider.example.simple.utils.DecodeBitmapTask;
 
 import java.util.Random;
 

@@ -11,6 +11,8 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.ramotion.cardslider.example.simple.utils.DecodeBitmapTask;
+
 public class DetailsActivity extends AppCompatActivity {
 
     static final String BUNDLE_IMAGE_ID = "BUNDLE_IMAGE_ID";
