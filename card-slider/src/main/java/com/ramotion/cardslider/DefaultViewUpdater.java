@@ -179,20 +179,28 @@ public class DefaultViewUpdater extends ViewUpdater {
     }
 
     protected void onUpdateViewAlpha(@NonNull View view, float alpha) {
-        ViewCompat.setAlpha(view, alpha);
+        if (ViewCompat.getAlpha(view) != alpha) {
+            ViewCompat.setAlpha(view, alpha);
+        }
     }
 
     protected void onUpdateViewScale(@NonNull View view, float scale) {
-        ViewCompat.setScaleX(view, scale);
-        ViewCompat.setScaleY(view, scale);
+        if (ViewCompat.getScaleX(view) != scale) {
+            ViewCompat.setScaleX(view, scale);
+            ViewCompat.setScaleY(view, scale);
+        }
     }
 
     protected void onUpdateViewZ(@NonNull View view, float z) {
-        ViewCompat.setZ(view, z);
+        if (ViewCompat.getZ(view) != z) {
+            ViewCompat.setZ(view, z);
+        }
     }
 
     protected void onUpdateViewTransitionX(@NonNull View view, float x) {
-        ViewCompat.setTranslationX(view, x);
+        if (ViewCompat.getTranslationX(view) != x) {
+            ViewCompat.setTranslationX(view, x);
+        }
     }
 
 }

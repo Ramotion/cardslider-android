@@ -32,8 +32,13 @@ public class CardsUpdater extends DefaultViewUpdater {
             ViewCompat.setAlpha(alphaView, 0.9f - alpha);
             ViewCompat.setAlpha(imageView, 0.3f + alpha);
         } else {
-            ViewCompat.setAlpha(alphaView, 0f);
-            ViewCompat.setAlpha(imageView, 1f);
+            if (ViewCompat.getAlpha(alphaView) != 0) {
+                ViewCompat.setAlpha(alphaView, 0f);
+            }
+
+            if (ViewCompat.getAlpha(imageView) != 1) {
+                ViewCompat.setAlpha(imageView, 1f);
+            }
         }
     }
 
