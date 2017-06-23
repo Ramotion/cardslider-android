@@ -20,7 +20,8 @@ The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=speci
 
 ## Installation
 ​
-...
+
+```
 
 ## Basic usage
 
