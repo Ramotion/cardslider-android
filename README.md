@@ -20,7 +20,25 @@ The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=speci
 
 ## Installation
 ​
-...
+Just download the package from [here](http://central.maven.org/maven2/com/ramotion/cardslider/card-slider/0.1.0/card-slider-0.1.0.aar) and add it to your project classpath, or just use the maven repo:
+
+Gradle:
+```groovy
+'com.ramotion.cardslider:card-slider:0.1.0'
+```
+SBT:
+```scala
+libraryDependencies += "com.ramotion.cardslider" % "card-slider" % "0.1.0"
+```
+Maven:
+```xml
+<dependency>
+	<groupId>com.ramotion.cardslider</groupId>
+	<artifactId>card-slider</artifactId>
+	<version>0.1.0</version>
+</dependency>
+```
+​
 
 ## Basic usage
 
