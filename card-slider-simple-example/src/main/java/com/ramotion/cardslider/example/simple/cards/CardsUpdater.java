@@ -1,5 +1,6 @@
 package com.ramotion.cardslider.example.simple.cards;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
@@ -42,4 +43,12 @@ public class CardsUpdater extends DefaultViewUpdater {
         }
     }
 
+    @Override
+    protected void onUpdateViewZ(@NonNull View view, float z) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            ((CardView)view).setCardElevation(Math.max(0, z));
+        } else {
+            super.onUpdateViewZ(view, z);
+        }
+    }
 }
