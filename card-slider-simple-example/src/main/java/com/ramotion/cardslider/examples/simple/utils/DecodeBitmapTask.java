@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple.utils;
+package com.ramotion.cardslider.examples.simple.utils;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -13,7 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 
-import com.ramotion.cardslider.example.simple.R;
+import com.ramotion.cardslider.examples.simple.R;
 
 
 public class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {

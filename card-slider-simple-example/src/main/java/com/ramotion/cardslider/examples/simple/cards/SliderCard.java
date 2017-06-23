@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple.cards;
+package com.ramotion.cardslider.examples.simple.cards;
 
 import android.graphics.Bitmap;
 import android.support.annotation.DrawableRes;
@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 
-import com.ramotion.cardslider.example.simple.R;
-import com.ramotion.cardslider.example.simple.utils.DecodeBitmapTask;
+import com.ramotion.cardslider.examples.simple.R;
+import com.ramotion.cardslider.examples.simple.utils.DecodeBitmapTask;
 
 public class SliderCard extends RecyclerView.ViewHolder {
 

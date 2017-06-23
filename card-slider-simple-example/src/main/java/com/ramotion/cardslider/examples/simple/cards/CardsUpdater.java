@@ -1,11 +1,9 @@
-package com.ramotion.cardslider.example.simple.cards;
+package com.ramotion.cardslider.examples.simple.cards;
 
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
-import android.util.Log;
 import android.view.View;
 
 import com.ramotion.cardslider.CardSliderLayoutManager;
