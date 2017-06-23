@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/42eb7b00b93645c0812c045ab26cb3b7)](https://www.codacy.com/app/andreylos/cardslider-android?utm_source=github.com&utm_medium=referral&utm_content=Ramotion/cardslider-android&utm_campaign=badger)
 [![header](./header.png)](https://business.ramotion.com?utm_source=gthb&utm_medium=special&utm_campaign=cardslider-android-logo)
 
 # CardSlider for Android
