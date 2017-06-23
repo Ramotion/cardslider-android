@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple.utils;
+package com.ramotion.cardslider.examples.simple.utils;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;

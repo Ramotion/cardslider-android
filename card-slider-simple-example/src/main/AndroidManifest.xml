@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ramotion.cardslider.example.simple">
+    package="com.ramotion.cardslider.examples.simple">
 
     <application
         android:allowBackup="true"
@@ -12,7 +12,7 @@
         android:largeHeap="true">
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.ramotion.cardslider.examples.simple.MainActivity"
             android:screenOrientation="portrait">
 
             <intent-filter>
@@ -23,7 +23,7 @@
         </activity>
 
         <activity
-            android:name=".DetailsActivity"
+            android:name="com.ramotion.cardslider.examples.simple.DetailsActivity"
             android:screenOrientation="portrait"/>
 
     </application>

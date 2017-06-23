@@ -1,4 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'signing'
+apply plugin: 'com.bmuschko.nexus'
+
+group = 'com.ramotion.cardslider'
+version = '0.1.0'
 
 android {
     compileSdkVersion 25
@@ -8,10 +13,8 @@ android {
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
-
+        versionName version
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
     buildTypes {
         release {
@@ -34,4 +37,46 @@ dependencies {
     })
 
     testCompile 'junit:junit:4.12'
+}
+
+modifyPom {
+    project {
+        name 'Card Slider for Android'
+        description 'Cardslider is a controller that allows you to swipe through cards with pictures and accompanying descriptions. http://ramotion.com'
+        url 'https://github.com/Ramotion/cardslider-android'
+        inceptionYear '2017'
+
+        scm {
+            url 'https://github.com/Ramotion/cardslider-android'
+            connection 'scm:git@github.com:Ramotion/cardslider-android.git'
+            developerConnection 'scm:git@github.com:Ramotion/cardslider-android.git'
+        }
+
+        licenses {
+            license {
+                name 'The MIT License (MIT)'
+                url 'https://opensource.org/licenses/mit-license.php'
+                distribution 'repo'
+            }
+        }
+
+        developers {
+            developer {
+                id 'dvg4000'
+                name 'Dmitry Grishechkin'
+                email 'dvgrishechkin@yandex.ru'
+            }
+            developer {
+                id 'oleg-vasiliev'
+                name 'Oleg Vasiliev'
+                email 'oleg-vasiliev@hotmail.com'
+            }
+        }
+    }
+}
+
+nexus {
+    sign = true
+    repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+    snapshotRepositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 }

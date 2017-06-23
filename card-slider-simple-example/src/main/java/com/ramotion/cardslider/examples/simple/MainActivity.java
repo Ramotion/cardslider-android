@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple;
+package com.ramotion.cardslider.examples.simple;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -26,8 +26,8 @@ import android.widget.ViewSwitcher;
 
 import com.ramotion.cardslider.CardSliderLayoutManager;
 import com.ramotion.cardslider.CardSnapHelper;
-import com.ramotion.cardslider.example.simple.cards.SliderAdapter;
-import com.ramotion.cardslider.example.simple.utils.DecodeBitmapTask;
+import com.ramotion.cardslider.examples.simple.cards.SliderAdapter;
+import com.ramotion.cardslider.examples.simple.utils.DecodeBitmapTask;
 
 import java.util.Random;
 

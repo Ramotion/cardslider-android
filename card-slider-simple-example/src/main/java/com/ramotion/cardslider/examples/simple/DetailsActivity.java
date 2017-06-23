@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple;
+package com.ramotion.cardslider.examples.simple;
 
 import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
@@ -11,7 +11,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.ramotion.cardslider.example.simple.utils.DecodeBitmapTask;
+import com.ramotion.cardslider.examples.simple.utils.DecodeBitmapTask;
 
 public class DetailsActivity extends AppCompatActivity {
 

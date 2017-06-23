@@ -64,7 +64,7 @@
         android:clipChildren="false"
         android:overScrollMode="never"
         app:layoutManager="com.ramotion.cardslider.CardSliderLayoutManager"
-        app:viewUpdater="com.ramotion.cardslider.example.simple.cards.CardsUpdater"/>
+        app:viewUpdater="com.ramotion.cardslider.examples.simple.cards.CardsUpdater"/>
 
     <FrameLayout
         android:layout_width="match_parent"

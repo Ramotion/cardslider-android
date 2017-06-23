@@ -1,4 +1,4 @@
-package com.ramotion.cardslider.example.simple.cards;
+package com.ramotion.cardslider.examples.simple.cards;
 
 
 import android.support.v7.widget.RecyclerView;
@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ramotion.cardslider.example.simple.R;
+import com.ramotion.cardslider.examples.simple.R;
 
 public class SliderAdapter extends RecyclerView.Adapter<SliderCard> {
 
