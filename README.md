@@ -20,23 +20,7 @@ The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=speci
 
 ## Installation
 ​
-maven repo:
 
-Gradle:
-```groovy
-'com.ramotion.expandingcollection:expanding-collection:0.9.0'
-```
-SBT:
-```scala
-libraryDependencies += "com.ramotion.expandingcollection" % "expanding-collection" % "0.9.0"
-```
-Maven:
-```xml
-<dependency>
-	<groupId>com.ramotion.expandingcollection</groupId>
-	<artifactId>expanding-collection</artifactId>
-	<version>0.9.0</version>
-</dependency>
 ```
 
 ## Basic usage
@@ -69,7 +53,7 @@ You can find this and other, more complex, examples in this repository ​
 
 ## Licence
 ​
-Expanding Collection is released under the MIT license.
+CardSlider for Android is released under the MIT license.
 See [LICENSE](./LICENSE.md) for details.
 
 ## Follow us
