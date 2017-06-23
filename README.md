@@ -3,6 +3,9 @@
 # CardSlider for Android
 [![Twitter](https://img.shields.io/badge/Twitter-@Ramotion-blue.svg?style=flat)](http://twitter.com/Ramotion)
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/42eb7b00b93645c0812c045ab26cb3b7)](https://www.codacy.com/app/andreylos/cardslider-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ramotion/cardslider-android&amp;utm_campaign=Badge_Grade)
+[![CircleCI](https://circleci.com/gh/Ramotion/cardslider-android/tree/master.svg?style=svg)](https://circleci.com/gh/Ramotion/cardslider-android/tree/master)
+
 ## About
 This project is maintained by Ramotion, Inc.<br>
 We specialize in the designing and coding of custom UI for Mobile Apps and Websites.<br><br>**Looking for developers for your project?** 
@@ -20,8 +23,25 @@ The [Android mockup](https://store.ramotion.com?utm_source=gthb&utm_medium=speci
 
 ## Installation
 ​
+Just download the package from [here](http://central.maven.org/maven2/com/ramotion/cardslider/card-slider/0.1.0/card-slider-0.1.0.aar) and add it to your project classpath, or just use the maven repo:
 
+Gradle:
+```groovy
+'com.ramotion.cardslider:card-slider:0.1.0'
 ```
+SBT:
+```scala
+libraryDependencies += "com.ramotion.cardslider" % "card-slider" % "0.1.0"
+```
+Maven:
+```xml
+<dependency>
+	<groupId>com.ramotion.cardslider</groupId>
+	<artifactId>card-slider</artifactId>
+	<version>0.1.0</version>
+</dependency>
+```
+​
 
 ## Basic usage
 
@@ -51,7 +71,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 You can find this and other, more complex, examples in this repository ​
 
-## Licence
+## License
 ​
 CardSlider for Android is released under the MIT license.
 See [LICENSE](./LICENSE.md) for details.
