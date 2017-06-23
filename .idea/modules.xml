@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/card-slider/card-slider.iml" filepath="$PROJECT_DIR$/card-slider/card-slider.iml" />
-      <module fileurl="file://$PROJECT_DIR$/card-slider-andoird.iml" filepath="$PROJECT_DIR$/card-slider-andoird.iml" />
       <module fileurl="file://$PROJECT_DIR$/card-slider-simple-example/card-slider-simple-example.iml" filepath="$PROJECT_DIR$/card-slider-simple-example/card-slider-simple-example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cardslider-android.iml" filepath="$PROJECT_DIR$/cardslider-android.iml" />
     </modules>
   </component>
 </project>
