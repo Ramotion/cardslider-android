@@ -12,32 +12,41 @@ import com.ramotion.cardslider.DefaultViewUpdater;
 public class CardsUpdater extends DefaultViewUpdater {
 
     @Override
-    protected void onUpdateViewAlpha(@NonNull View view, float alpha) {
+    public void updateView(@NonNull View view, float position) {
+        super.updateView(view, position);
+
         final CardView card = ((CardView)view);
         final View alphaView = card.getChildAt(1);
         final View imageView = card.getChildAt(0);
 
-        final boolean isLeftCard = alpha < 1;
-        if (isLeftCard) {
+        if (position < 0) {
+            final float alpha = ViewCompat.getAlpha(view);
+            ViewCompat.setAlpha(view, 1f);
             ViewCompat.setAlpha(alphaView, 0.9f - alpha);
             ViewCompat.setAlpha(imageView, 0.3f + alpha);
         } else {
-            if (ViewCompat.getAlpha(alphaView) != 0) {
-                ViewCompat.setAlpha(alphaView, 0f);
-            }
-
-            if (ViewCompat.getAlpha(imageView) != 1) {
-                ViewCompat.setAlpha(imageView, 1f);
-            }
+            ViewCompat.setAlpha(alphaView, 0f);
+            ViewCompat.setAlpha(imageView, 1f);
         }
-    }
 
-    @Override
-    protected void onUpdateViewZ(@NonNull View view, float z) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            ((CardView)view).setCardElevation(Math.max(0, z));
-        } else {
-            super.onUpdateViewZ(view, z);
+            final CardSliderLayoutManager lm =  getLayoutManager();
+            final float ratio = (float) lm.getDecoratedLeft(view) / lm.getActiveCardLeft();
+
+            final float z;
+
+            if (position < 0) {
+                z = Z_CENTER_1 * ratio;
+            } else if (position < 0.5f) {
+                z = Z_CENTER_1;
+            } else if (position < 1f) {
+                z = Z_CENTER_2;
+            } else {
+                z = Z_RIGHT;
+            }
+
+            card.setCardElevation(Math.max(0, z));
         }
     }
+
 }

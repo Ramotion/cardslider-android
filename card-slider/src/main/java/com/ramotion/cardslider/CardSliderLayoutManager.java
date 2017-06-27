@@ -30,7 +30,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         void onLayoutManagerInitialized(@NonNull CardSliderLayoutManager lm);
 
-        void updateView();
+        void updateView(@NonNull View view, float position);
 
     }
 
@@ -672,7 +672,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     private void updateViewScale() {
-        viewUpdater.updateView();
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View view = getChildAt(i);
+            final int viewLeft = getDecoratedLeft(view);
+
+            final float position = ((float) (viewLeft - activeCardLeft) / cardWidth);
+            viewUpdater.updateView(view, position);
+        }
     }
 
 }
