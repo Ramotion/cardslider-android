@@ -26,6 +26,54 @@ import java.util.LinkedList;
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
+    public interface ViewUpdater {
+
+        void onLayoutManagerInitialized(@NonNull CardSliderLayoutManager lm);
+
+        void updateView();
+
+    }
+
+    private static class SavedState implements Parcelable {
+
+        int anchorPos;
+
+        SavedState() {
+
+        }
+
+        SavedState(Parcel in) {
+            anchorPos = in.readInt();
+        }
+
+        public SavedState(SavedState other) {
+            anchorPos = other.anchorPos;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int i) {
+            parcel.writeInt(anchorPos);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel parcel) {
+                return new SavedState(parcel);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+
+    }
+
     private static final int DEFAULT_ACTIVE_CARD_LEFT_OFFSET = 50;
     private static final int DEFAULT_CARD_WIDTH = 148;
     private static final int DEFAULT_CARDS_GAP = 12;
@@ -112,9 +160,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         this.viewUpdater = updater;
         if (this.viewUpdater == null) {
-            this.viewUpdater = new DefaultViewUpdater(this);
+            this.viewUpdater = new DefaultViewUpdater();
         }
-        viewUpdater.onLayoutManagerInitialized();
+        viewUpdater.onLayoutManagerInitialized(this);
     }
 
     @Override
@@ -263,13 +311,57 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         if (scrollRequestedPosition != RecyclerView.NO_POSITION) {
             return scrollRequestedPosition;
         } else {
-            return viewUpdater.getActiveCardPosition();
+            int result = RecyclerView.NO_POSITION;
+
+            View biggestView = null;
+            float lastScaleX = 0f;
+
+            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+                final View child = getChildAt(i);
+                final int viewLeft = getDecoratedLeft(child);
+                if (viewLeft >= activeCardRight) {
+                    continue;
+                }
+
+                final float scaleX = ViewCompat.getScaleX(child);
+                if (lastScaleX < scaleX && viewLeft < activeCardCenter) {
+                    lastScaleX = scaleX;
+                    biggestView = child;
+                }
+            }
+
+            if (biggestView != null) {
+                result = getPosition(biggestView);
+            }
+
+            return result;
         }
     }
 
     @Nullable
     public View getTopView() {
-        return viewUpdater.getTopView();
+        if (getChildCount() == 0) {
+            return null;
+        }
+
+        View result = null;
+        float lastValue = cardWidth;
+
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View child = getChildAt(i);
+            if (getDecoratedLeft(child) >= activeCardRight) {
+                continue;
+            }
+
+            final int viewLeft = getDecoratedLeft(child);
+            final int diff = activeCardRight - viewLeft;
+            if (diff < lastValue) {
+                lastValue = diff;
+                result = child;
+            }
+        }
+
+        return result;
     }
 
     public int getActiveCardLeft() {
@@ -347,10 +439,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             final Class<? extends ViewUpdater> viewUpdaterClass =
                     classLoader.loadClass(fullClassName).asSubclass(ViewUpdater.class);
             final Constructor<? extends ViewUpdater> constructor =
-                    viewUpdaterClass.getConstructor(CardSliderLayoutManager.class);
+                    viewUpdaterClass.getConstructor();
 
             constructor.setAccessible(true);
-            updater = constructor.newInstance(this);
+            updater = constructor.newInstance();
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(attrs.getPositionDescription() +
                     ": Error creating LayoutManager " + className, e);
@@ -581,45 +673,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
     private void updateViewScale() {
         viewUpdater.updateView();
-    }
-
-    private static class SavedState implements Parcelable {
-
-        int anchorPos;
-
-        SavedState() {
-
-        }
-
-        SavedState(Parcel in) {
-            anchorPos = in.readInt();
-        }
-
-        public SavedState(SavedState other) {
-            anchorPos = other.anchorPos;
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel parcel, int i) {
-            parcel.writeInt(anchorPos);
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel parcel) {
-                return new SavedState(parcel);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 
 }

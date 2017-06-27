@@ -9,7 +9,7 @@ import android.view.View;
 /**
  * Default implementation of {@link ViewUpdater}
  */
-public class DefaultViewUpdater extends ViewUpdater {
+public class DefaultViewUpdater implements CardSliderLayoutManager.ViewUpdater {
 
     private static final float SCALE_LEFT = 0.65f;
     private static final float SCALE_CENTER = 0.95f;
@@ -31,12 +31,12 @@ public class DefaultViewUpdater extends ViewUpdater {
     private int transitionDistance;
     private float transitionRight2Center;
 
-    public DefaultViewUpdater(CardSliderLayoutManager lm) {
-        super(lm);
-    }
+    private CardSliderLayoutManager lm;
 
     @Override
-    public void onLayoutManagerInitialized() {
+    public void onLayoutManagerInitialized(@NonNull CardSliderLayoutManager lm) {
+        this.lm = lm;
+
         this.cardWidth = lm.getCardWidth();
         this.activeCardLeft = lm.getActiveCardLeft();
         this.activeCardRight = lm.getActiveCardRight();
@@ -50,61 +50,6 @@ public class DefaultViewUpdater extends ViewUpdater {
         final float rightBorder = (cardWidth - cardWidth * SCALE_RIGHT) / 2f;
         final float right2centerDistance = (activeCardRight + centerBorder) - (activeCardRight - rightBorder);
         this.transitionRight2Center = right2centerDistance - cardsGap;
-    }
-
-    @Override
-    public int getActiveCardPosition() {
-        int result = RecyclerView.NO_POSITION;
-
-        View biggestView = null;
-        float lastScaleX = 0f;
-
-        for (int i = 0, cnt = lm.getChildCount(); i < cnt; i++) {
-            final View child = lm.getChildAt(i);
-            final int viewLeft = lm.getDecoratedLeft(child);
-            if (viewLeft >= activeCardRight) {
-                continue;
-            }
-
-            final float scaleX = ViewCompat.getScaleX(child);
-            if (lastScaleX < scaleX && viewLeft < activeCardCenter) {
-                lastScaleX = scaleX;
-                biggestView = child;
-            }
-        }
-
-        if (biggestView != null) {
-            result = lm.getPosition(biggestView);
-        }
-
-        return result;
-    }
-
-    @Nullable
-    @Override
-    public View getTopView() {
-        if (lm.getChildCount() == 0) {
-            return null;
-        }
-
-        View result = null;
-        float lastValue = cardWidth;
-
-        for (int i = 0, cnt = lm.getChildCount(); i < cnt; i++) {
-            final View child = lm.getChildAt(i);
-            if (lm.getDecoratedLeft(child) >= activeCardRight) {
-                continue;
-            }
-
-            final int viewLeft = lm.getDecoratedLeft(child);
-            final int diff = activeCardRight - viewLeft;
-            if (diff < lastValue) {
-                lastValue = diff;
-                result = child;
-            }
-        }
-
-        return result;
     }
 
     @Override

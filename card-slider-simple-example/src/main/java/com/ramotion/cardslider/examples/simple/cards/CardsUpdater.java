@@ -11,15 +11,6 @@ import com.ramotion.cardslider.DefaultViewUpdater;
 
 public class CardsUpdater extends DefaultViewUpdater {
 
-    public CardsUpdater(CardSliderLayoutManager lm) {
-        super(lm);
-    }
-
-    @Override
-    public void onLayoutManagerInitialized() {
-        super.onLayoutManagerInitialized();
-    }
-
     @Override
     protected void onUpdateViewAlpha(@NonNull View view, float alpha) {
         final CardView card = ((CardView)view);
