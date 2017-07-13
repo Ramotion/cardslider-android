@@ -26,12 +26,22 @@ import java.util.LinkedList;
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
+    /**
+     * A ViewUpdater is invoked whenever a visible/attached card is scrolled.
+     */
     public interface ViewUpdater {
-
+        /**
+         * Called when CardSliderLayoutManager initialized
+         */
         void onLayoutManagerInitialized(@NonNull CardSliderLayoutManager lm);
 
+        /**
+         * Called on view update (scroll, layout).
+         * @param view      Updating view
+         * @param position  Position of card relative to the current active card position of the layout manager.
+         *                  0 is active card. 1 is first right card, and -1 is first left (stacked) card.
+         */
         void updateView(@NonNull View view, float position);
-
     }
 
     private static class SavedState implements Parcelable {
