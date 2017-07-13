@@ -26,6 +26,64 @@ import java.util.LinkedList;
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
+    /**
+     * A ViewUpdater is invoked whenever a visible/attached card is scrolled.
+     */
+    public interface ViewUpdater {
+        /**
+         * Called when CardSliderLayoutManager initialized
+         */
+        void onLayoutManagerInitialized(@NonNull CardSliderLayoutManager lm);
+
+        /**
+         * Called on view update (scroll, layout).
+         * @param view      Updating view
+         * @param position  Position of card relative to the current active card position of the layout manager.
+         *                  0 is active card. 1 is first right card, and -1 is first left (stacked) card.
+         */
+        void updateView(@NonNull View view, float position);
+    }
+
+    private static class SavedState implements Parcelable {
+
+        int anchorPos;
+
+        SavedState() {
+
+        }
+
+        SavedState(Parcel in) {
+            anchorPos = in.readInt();
+        }
+
+        public SavedState(SavedState other) {
+            anchorPos = other.anchorPos;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int i) {
+            parcel.writeInt(anchorPos);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel parcel) {
+                return new SavedState(parcel);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+
+    }
+
     private static final int DEFAULT_ACTIVE_CARD_LEFT_OFFSET = 50;
     private static final int DEFAULT_CARD_WIDTH = 148;
     private static final int DEFAULT_CARDS_GAP = 12;
@@ -112,9 +170,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
 
         this.viewUpdater = updater;
         if (this.viewUpdater == null) {
-            this.viewUpdater = new DefaultViewUpdater(this);
+            this.viewUpdater = new DefaultViewUpdater();
         }
-        viewUpdater.onLayoutManagerInitialized();
+        viewUpdater.onLayoutManagerInitialized(this);
     }
 
     @Override
@@ -263,13 +321,57 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         if (scrollRequestedPosition != RecyclerView.NO_POSITION) {
             return scrollRequestedPosition;
         } else {
-            return viewUpdater.getActiveCardPosition();
+            int result = RecyclerView.NO_POSITION;
+
+            View biggestView = null;
+            float lastScaleX = 0f;
+
+            for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+                final View child = getChildAt(i);
+                final int viewLeft = getDecoratedLeft(child);
+                if (viewLeft >= activeCardRight) {
+                    continue;
+                }
+
+                final float scaleX = ViewCompat.getScaleX(child);
+                if (lastScaleX < scaleX && viewLeft < activeCardCenter) {
+                    lastScaleX = scaleX;
+                    biggestView = child;
+                }
+            }
+
+            if (biggestView != null) {
+                result = getPosition(biggestView);
+            }
+
+            return result;
         }
     }
 
     @Nullable
     public View getTopView() {
-        return viewUpdater.getTopView();
+        if (getChildCount() == 0) {
+            return null;
+        }
+
+        View result = null;
+        float lastValue = cardWidth;
+
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View child = getChildAt(i);
+            if (getDecoratedLeft(child) >= activeCardRight) {
+                continue;
+            }
+
+            final int viewLeft = getDecoratedLeft(child);
+            final int diff = activeCardRight - viewLeft;
+            if (diff < lastValue) {
+                lastValue = diff;
+                result = child;
+            }
+        }
+
+        return result;
     }
 
     public int getActiveCardLeft() {
@@ -347,10 +449,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             final Class<? extends ViewUpdater> viewUpdaterClass =
                     classLoader.loadClass(fullClassName).asSubclass(ViewUpdater.class);
             final Constructor<? extends ViewUpdater> constructor =
-                    viewUpdaterClass.getConstructor(CardSliderLayoutManager.class);
+                    viewUpdaterClass.getConstructor();
 
             constructor.setAccessible(true);
-            updater = constructor.newInstance(this);
+            updater = constructor.newInstance();
         } catch (NoSuchMethodException e) {
             throw new IllegalStateException(attrs.getPositionDescription() +
                     ": Error creating LayoutManager " + className, e);
@@ -580,46 +682,13 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     private void updateViewScale() {
-        viewUpdater.updateView();
-    }
+        for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
+            final View view = getChildAt(i);
+            final int viewLeft = getDecoratedLeft(view);
 
-    private static class SavedState implements Parcelable {
-
-        int anchorPos;
-
-        SavedState() {
-
+            final float position = ((float) (viewLeft - activeCardLeft) / cardWidth);
+            viewUpdater.updateView(view, position);
         }
-
-        SavedState(Parcel in) {
-            anchorPos = in.readInt();
-        }
-
-        public SavedState(SavedState other) {
-            anchorPos = other.anchorPos;
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel parcel, int i) {
-            parcel.writeInt(anchorPos);
-        }
-
-        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel parcel) {
-                return new SavedState(parcel);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
 
 }
