@@ -136,7 +136,11 @@ public class DefaultViewUpdater extends ViewUpdater {
                 scale = SCALE_CENTER - SCALE_CENTER_TO_RIGHT * ratio;
                 alpha = 1;
                 z = Z_CENTER_2;
-                x = -Math.min(transitionRight2Center, transitionRight2Center * (viewLeft - transitionEnd) / transitionDistance);
+                if (Math.abs(transitionRight2Center) < Math.abs(transitionRight2Center * (viewLeft - transitionEnd) / transitionDistance)) {
+                    x = -transitionRight2Center;
+                } else {
+                    x = -transitionRight2Center * (viewLeft - transitionEnd) / transitionDistance;
+                }
             } else {
                 scale = SCALE_RIGHT;
                 alpha = 1;
