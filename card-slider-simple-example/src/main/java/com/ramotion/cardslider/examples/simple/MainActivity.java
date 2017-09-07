@@ -152,8 +152,8 @@ public class MainActivity extends AppCompatActivity {
                 final int viewTop = mapSwitcher.getTop() + mapSwitcher.getHeight() / 3;
 
                 final int border = 100;
-                final int xRange = mapSwitcher.getWidth() - border * 2;
-                final int yRange = (mapSwitcher.getHeight() / 3) * 2 - border * 2;
+                final int xRange = Math.max(1, mapSwitcher.getWidth() - border * 2);
+                final int yRange = Math.max(1, (mapSwitcher.getHeight() / 3) * 2 - border * 2);
 
                 final Random rnd = new Random();
 
