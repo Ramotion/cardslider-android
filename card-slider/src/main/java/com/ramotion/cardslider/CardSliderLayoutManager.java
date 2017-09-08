@@ -459,7 +459,10 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         } catch (ClassNotFoundException e) {
             throw new IllegalStateException(attrs.getPositionDescription()
                     + ": Unable to find ViewUpdater" + className, e);
-        } catch (InvocationTargetException | InstantiationException e) {
+        } catch (InvocationTargetException e) {
+            throw new IllegalStateException(attrs.getPositionDescription()
+                    + ": Could not instantiate the ViewUpdater: " + className, e);
+        } catch (InstantiationException e) {
             throw new IllegalStateException(attrs.getPositionDescription()
                     + ": Could not instantiate the ViewUpdater: " + className, e);
         } catch (IllegalAccessException e) {
