@@ -102,6 +102,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     private int scrollRequestedPosition = 0;
 
     private ViewUpdater viewUpdater;
+    private RecyclerView recyclerView;
 
     /**
      * Creates CardSliderLayoutManager with default values
@@ -183,7 +184,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
     }
 
     @Override
-    public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+    public void onLayoutChildren(RecyclerView.Recycler recycler, final RecyclerView.State state) {
         if (getItemCount() == 0) {
             removeAndRecycleAllViews(recycler);
             return;
@@ -196,34 +197,46 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         int anchorPos = getActiveCardPosition();
 
         if (state.isPreLayout()) {
-            final LinkedList<Integer> removedPositions = new LinkedList<>();
+            final LinkedList<Integer> removed = new LinkedList<>();
             for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
                 final View child = getChildAt(i);
                 final boolean isRemoved = ((RecyclerView.LayoutParams)child.getLayoutParams()).isItemRemoved();
                 if (isRemoved) {
-                    removedPositions.add(getPosition(child));
+                    removed.add(getPosition(child));
                 }
             }
 
-            if (removedPositions.contains(anchorPos)) {
-                final int last = removedPositions.getLast();
-                final int first = removedPositions.getFirst();
+            if (removed.contains(anchorPos)) {
+                final int first = removed.getFirst();
+                final int last = removed.getLast();
 
-                final int right = Math.min(last, getItemCount() - 1);
-
-                int left = right;
-                if (last != first) {
-                    left = Math.max(first, 0);
-                }
+                final int left = first - 1;
+                final int right = last == getItemCount() + removed.size() - 1 ? RecyclerView.NO_POSITION : last;
 
                 anchorPos = Math.max(left, right);
             }
+
+            scrollRequestedPosition = anchorPos;
         }
 
         detachAndScrapAttachedViews(recycler);
         fill(anchorPos, recycler, state);
+
         if (cardsXCoords.size() != 0) {
             layoutByCoords();
+        }
+
+        if (state.isPreLayout()) {
+            if (recyclerView != null && recyclerView.getItemAnimator() != null){
+                recyclerView.postOnAnimationDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateViewScale(state);
+                    }
+                }, 415);
+            }
+        } else {
+            updateViewScale(state);
         }
     }
 
@@ -264,6 +277,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
 
         fill(getActiveCardPosition(), recycler, state);
+        updateViewScale(state);
 
         cardsXCoords.clear();
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
@@ -312,6 +326,18 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             scrollRequestedPosition = state.anchorPos;
             requestLayout();
         }
+    }
+
+    @Override
+    public void onAttachedToWindow(RecyclerView view) {
+        super.onAttachedToWindow(view);
+        recyclerView = view;
+    }
+
+    @Override
+    public void onDetachedFromWindow(RecyclerView view, RecyclerView.Recycler recycler) {
+        super.onDetachedFromWindow(view, recycler);
+        recyclerView = null;
     }
 
     /**
@@ -596,7 +622,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             final int viewLeft = cardsXCoords.get(getPosition(view));
             layoutDecorated(view, viewLeft, 0, viewLeft + cardWidth, getDecoratedBottom(view));
         }
-        updateViewScale();
         cardsXCoords.clear();
     }
 
@@ -621,8 +646,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         for (int i = 0, cnt = viewCache.size(); i < cnt; i++) {
             recycler.recycleView(viewCache.valueAt(i));
         }
-
-        updateViewScale();
     }
 
     private void fillLeft(int anchorPos, RecyclerView.Recycler recycler) {
@@ -684,7 +707,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
-    private void updateViewScale() {
+    private void updateViewScale(RecyclerView.State state) {
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
