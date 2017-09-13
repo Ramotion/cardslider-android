@@ -26,6 +26,26 @@ import java.util.LinkedList;
 public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         implements RecyclerView.SmoothScroller.ScrollVectorProvider {
 
+    private static final int DEFAULT_ACTIVE_CARD_LEFT_OFFSET = 50;
+    private static final int DEFAULT_CARD_WIDTH = 148;
+    private static final int DEFAULT_CARDS_GAP = 12;
+    private static final int LEFT_CARD_COUNT = 2;
+
+    private final SparseArray<View> viewCache = new SparseArray<>();
+    private final SparseIntArray cardsXCoords = new SparseIntArray();
+
+    private int cardWidth;
+    private int activeCardLeft;
+    private int activeCardRight;
+    private int activeCardCenter;
+
+    private float cardsGap;
+
+    private int scrollRequestedPosition = 0;
+
+    private ViewUpdater viewUpdater;
+    private RecyclerView recyclerView;
+
     /**
      * A ViewUpdater is invoked whenever a visible/attached card is scrolled.
      */
@@ -83,26 +103,6 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         };
 
     }
-
-    private static final int DEFAULT_ACTIVE_CARD_LEFT_OFFSET = 50;
-    private static final int DEFAULT_CARD_WIDTH = 148;
-    private static final int DEFAULT_CARDS_GAP = 12;
-    private static final int LEFT_CARD_COUNT = 2;
-
-    private final SparseArray<View> viewCache = new SparseArray<>();
-    private final SparseIntArray cardsXCoords = new SparseIntArray();
-
-    private int cardWidth;
-    private int activeCardLeft;
-    private int activeCardRight;
-    private int activeCardCenter;
-
-    private float cardsGap;
-
-    private int scrollRequestedPosition = 0;
-
-    private ViewUpdater viewUpdater;
-    private RecyclerView recyclerView;
 
     /**
      * Creates CardSliderLayoutManager with default values
@@ -227,16 +227,14 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
 
         if (state.isPreLayout()) {
-            if (recyclerView != null && recyclerView.getItemAnimator() != null){
-                recyclerView.postOnAnimationDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateViewScale(state);
-                    }
-                }, 415);
-            }
+            recyclerView.postOnAnimationDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    updateViewScale();
+                }
+            }, 415);
         } else {
-            updateViewScale(state);
+            updateViewScale();
         }
     }
 
@@ -277,7 +275,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
 
         fill(getActiveCardPosition(), recycler, state);
-        updateViewScale(state);
+        updateViewScale();
 
         cardsXCoords.clear();
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
@@ -707,7 +705,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
         }
     }
 
-    private void updateViewScale(RecyclerView.State state) {
+    private void updateViewScale() {
         for (int i = 0, cnt = getChildCount(); i < cnt; i++) {
             final View view = getChildAt(i);
             final int viewLeft = getDecoratedLeft(view);
