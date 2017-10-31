@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentPosition;
 
     private DecodeBitmapTask decodeMapBitmapTask;
+    private DecodeBitmapTask.Listener mapLoadListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (decodeMapBitmapTask != null) {
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing() && decodeMapBitmapTask != null) {
             decodeMapBitmapTask.cancel(true);
         }
     }
@@ -124,6 +125,14 @@ public class MainActivity extends AppCompatActivity {
         mapSwitcher.setOutAnimation(this, R.anim.fade_out);
         mapSwitcher.setFactory(new ImageViewFactory());
         mapSwitcher.setImageResource(maps[0]);
+
+        mapLoadListener = new DecodeBitmapTask.Listener() {
+            @Override
+            public void onPostExecuted(Bitmap bitmap) {
+                ((ImageView)mapSwitcher.getNextView()).setImageBitmap(bitmap);
+                mapSwitcher.showNext();
+            }
+        };
     }
 
     private void initCountryText() {
@@ -255,15 +264,10 @@ public class MainActivity extends AppCompatActivity {
             decodeMapBitmapTask.cancel(true);
         }
 
-        decodeMapBitmapTask = new DecodeBitmapTask(getResources(), resId, mapSwitcher.getWidth(), mapSwitcher.getHeight()) {
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-                ((ImageView)mapSwitcher.getNextView()).setImageBitmap(bitmap);
-                mapSwitcher.showNext();
-            }
-        };
+        final int w = mapSwitcher.getWidth();
+        final int h = mapSwitcher.getHeight();
 
+        decodeMapBitmapTask = new DecodeBitmapTask(getResources(), resId, w, h, mapLoadListener);
         decodeMapBitmapTask.execute();
     }
 

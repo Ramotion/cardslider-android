@@ -13,7 +13,7 @@ import android.widget.ImageView;
 
 import com.ramotion.cardslider.examples.simple.utils.DecodeBitmapTask;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements DecodeBitmapTask.Listener {
 
     static final String BUNDLE_IMAGE_ID = "BUNDLE_IMAGE_ID";
 
@@ -71,8 +71,8 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
 
         if (isFinishing() && decodeBitmapTask != null) {
             decodeBitmapTask.cancel(true);
@@ -103,14 +103,16 @@ public class DetailsActivity extends AppCompatActivity {
         final DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
 
-        decodeBitmapTask = new DecodeBitmapTask(getResources(), bigResId, metrics.widthPixels, metrics.heightPixels) {
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-                imageView.setImageBitmap(bitmap);
-            }
-        };
+        final int w = metrics.widthPixels;
+        final int h = metrics.heightPixels;
+
+        decodeBitmapTask = new DecodeBitmapTask(getResources(), bigResId, w, h, this);
         decodeBitmapTask.execute();
+    }
+
+    @Override
+    public void onPostExecuted(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
     }
 
 }

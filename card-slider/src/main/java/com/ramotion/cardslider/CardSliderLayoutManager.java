@@ -116,9 +116,9 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
      * Constructor used when layout manager is set in XML by RecyclerView attribute
      * "layoutManager".
      *
-     * @attr ref R.styleable#CardSlider_activeCardLeftOffset
-     * @attr ref R.styleable#CardSlider_cardWidth
-     * @attr ref R.styleable#CardSlider_cardsGap
+     * See {@link R.styleable#CardSlider_activeCardLeftOffset}
+     * See {@link R.styleable#CardSlider_cardWidth}
+     * See {@link R.styleable#CardSlider_cardsGap}
      */
     public CardSliderLayoutManager(@NonNull Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         final float density = context.getResources().getDisplayMetrics().density;
@@ -442,7 +442,7 @@ public class CardSliderLayoutManager extends RecyclerView.LayoutManager
             fullClassName = CardSliderLayoutManager.class.getPackage().getName() + '.' + className;
         }
 
-        ViewUpdater updater = null;
+        ViewUpdater updater;
         try {
             final ClassLoader classLoader = context.getClassLoader();
 

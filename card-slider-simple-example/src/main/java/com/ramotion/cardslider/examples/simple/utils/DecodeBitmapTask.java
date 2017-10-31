@@ -12,8 +12,12 @@ import android.graphics.RectF;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 
 import com.ramotion.cardslider.examples.simple.R;
+
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 
 
 public class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
@@ -24,12 +28,22 @@ public class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
     private final int reqWidth;
     private final int reqHeight;
 
-    public DecodeBitmapTask(Resources resources, @DrawableRes int bitmapResId, int reqWidth, int reqHeight) {
+    private final Reference<Listener> refListener;
+
+    public interface Listener {
+        void onPostExecuted(Bitmap bitmap);
+    }
+
+    public DecodeBitmapTask(Resources resources, @DrawableRes int bitmapResId,
+                            int reqWidth, int reqHeight,
+                            @NonNull Listener listener)
+    {
         this.cache = BackgroundBitmapCache.getInstance();
         this.resources = resources;
         this.bitmapResId = bitmapResId;
         this.reqWidth = reqWidth;
         this.reqHeight = reqHeight;
+        this.refListener = new WeakReference<>(listener);
     }
 
     @Override
@@ -79,6 +93,14 @@ public class DecodeBitmapTask extends AsyncTask<Void, Void, Bitmap> {
 
         cache.addBitmapToBgMemoryCache(bitmapResId, result);
         return result;
+    }
+
+    @Override
+    final protected void onPostExecute(Bitmap bitmap) {
+        final Listener listener = this.refListener.get();
+        if (listener != null) {
+            listener.onPostExecuted(bitmap);
+        }
     }
 
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float pixels, int width, int height) {

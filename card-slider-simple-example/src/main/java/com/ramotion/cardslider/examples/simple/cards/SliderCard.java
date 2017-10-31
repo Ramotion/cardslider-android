@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import com.ramotion.cardslider.examples.simple.R;
 import com.ramotion.cardslider.examples.simple.utils.DecodeBitmapTask;
 
-public class SliderCard extends RecyclerView.ViewHolder {
+public class SliderCard extends RecyclerView.ViewHolder implements DecodeBitmapTask.Listener {
 
     private static int viewWidth = 0;
     private static int viewHeight = 0;
@@ -48,14 +48,13 @@ public class SliderCard extends RecyclerView.ViewHolder {
     }
 
     private void loadBitmap(@DrawableRes int resId) {
-        task = new DecodeBitmapTask(itemView.getResources(), resId, viewWidth, viewHeight) {
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                super.onPostExecute(bitmap);
-                imageView.setImageBitmap(bitmap);
-            }
-        };
+        task = new DecodeBitmapTask(itemView.getResources(), resId, viewWidth, viewHeight, this);
         task.execute();
+    }
+
+    @Override
+    public void onPostExecuted(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
     }
 
 }
