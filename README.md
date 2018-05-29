@@ -1,5 +1,6 @@
 ![header](./header.png)
-![Animation](./preview.gif)
+<img src="https://github.com/Ramotion/cardslider-android/blob/master/preview.gif" width="600" height="450" />
+<br><br/>
 # CardSlider for Android
 [![Twitter](https://img.shields.io/badge/Twitter-@Ramotion-blue.svg?style=flat)](http://twitter.com/Ramotion)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/42eb7b00b93645c0812c045ab26cb3b7)](https://www.codacy.com/app/andreylos/cardslider-android?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ramotion/cardslider-android&amp;utm_campaign=Badge_Grade)
