@@ -84,11 +84,10 @@ This library is a part of a <a href="https://github.com/Ramotion/android-ui-anim
 CardSlider for Android is released under the MIT license.
 See [LICENSE](./LICENSE.md) for details.
 
-# Get the Showroom App for iOS to give it a try
-Try our UI components in our iOS app. Contact us if interested.
+# Get the Showroom App for Android to give it a try
+Try our UI components in our Android app. Contact us if interested.
 
-<a href="https://itunes.apple.com/app/apple-store/id1182360240?pt=550053&ct=cardslider-android&mt=8" > 
-<img src="https://github.com/ramotion/gliding-collection/raw/master/app_store@2x.png" width="117" height="34"></a>
+<a href='https://play.google.com/store/apps/details?id=com.ramotion.showroom&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://github.com/ramotion/cardslider-android/raw/master/google_play@2x.png' width="114" height="34"/></a>
 <a href="https://dev.ramotion.com/?utm_source=gthb&utm_medium=special&utm_campaign=card-sliderandroid-contact-us"> 
 <img src="https://github.com/ramotion/gliding-collection/raw/master/contact_our_team@2x.png" width="187" height="34"></a>
 <br>
