@@ -8,12 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StyleRes;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StyleRes;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.core.view.ViewCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -273,7 +275,8 @@ public class MainActivity extends AppCompatActivity {
 
     private class TextViewFactory implements  ViewSwitcher.ViewFactory {
 
-        @StyleRes final int styleId;
+        @StyleRes
+        final int styleId;
         final boolean center;
 
         TextViewFactory(@StyleRes int styleId, boolean center) {
