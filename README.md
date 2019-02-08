@@ -34,22 +34,22 @@ ___
 
 ## Installation
 ​
-Just download the package from [here](http://central.maven.org/maven2/com/ramotion/cardslider/card-slider/0.1.0/card-slider-0.3.0.aar) and add it to your project classpath, or just use the maven repo:
+Just download the package from [here](http://central.maven.org/maven2/com/ramotion/cardslider/card-slider/0.3.1/card-slider-0.3.1.aar) and add it to your project classpath, or just use the maven repo:
 
 Gradle:
 ```groovy
-'com.ramotion.cardslider:card-slider:0.3.0'
+'com.ramotion.cardslider:card-slider:0.3.1'
 ```
 SBT:
 ```scala
-libraryDependencies += "com.ramotion.cardslider" % "card-slider" % "0.3.0"
+libraryDependencies += "com.ramotion.cardslider" % "card-slider" % "0.3.1"
 ```
 Maven:
 ```xml
 <dependency>
 	<groupId>com.ramotion.cardslider</groupId>
 	<artifactId>card-slider</artifactId>
-	<version>0.3.0</version>
+	<version>0.3.1</version>
 </dependency>
 ```
 ​
